@@ -1,0 +1,41 @@
+.page { display: grid; min-height: 100vh; color: var(--white); background: var(--ink); grid-template-columns: 1.08fr .92fr; }
+.page::after { position: fixed; z-index: 9999; inset: 0; content: ""; pointer-events: none; background: #050505; animation: loginBlackFade .5s ease-out forwards; }
+@keyframes loginBlackFade { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
+.poster { position: relative; display: flex; min-width: 0; min-height: 100vh; overflow: hidden; padding: 42px clamp(38px, 5vw, 90px); justify-content: center; flex-direction: column; background: var(--wine); border-right: 16px solid var(--red); }
+.poster::before { position: absolute; inset: 0; content: ""; opacity: .16; background: repeating-linear-gradient(0deg, transparent 0 6px, rgba(255,255,255,.08) 7px); }
+.back { position: absolute; z-index: 3; top: 38px; left: 38px; font-size: 9px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.posterContent { position: relative; z-index: 2; min-width: 0; max-width: 100%; }
+.posterContent p { margin-bottom: 25px; font-size: 9px; font-weight: 900; letter-spacing: .22em; }
+.posterContent h1 { max-width: 100%; overflow-wrap: normal; font-family: var(--font-display); font-size: clamp(54px, 6.4vw, 96px); line-height: .82; letter-spacing: -.045em; text-transform: uppercase; }
+.posterContent span { display: block; margin-top: 38px; font-size: 10px; font-weight: 900; letter-spacing: .2em; }
+.mark { position: absolute; right: -12%; bottom: -12%; width: 65%; height: auto; opacity: .19; filter: brightness(2.4) grayscale(1); transform: rotate(-9deg); }
+.poster > small { position: absolute; bottom: 28px; left: 38px; font-size: 8px; font-weight: 900; letter-spacing: .16em; }
+.formPanel { display: flex; min-width: 0; padding: 65px clamp(35px, 5vw, 82px); justify-content: center; flex-direction: column; }
+.formHeader { display: flex; margin-bottom: 38px; align-items: flex-end; gap: 22px; border-bottom: 4px solid var(--red); }
+.formHeader > span { color: #57534f; font-family: var(--font-display); font-size: 82px; line-height: .8; }
+.loginHeaderLogo { width: 76px; height: 76px; flex: 0 0 auto; object-fit: contain; filter: saturate(.9) brightness(1.15); }
+.formHeader p { color: #bf7777; font-size: 8px; font-weight: 900; letter-spacing: .18em; }
+.formHeader h2 { max-width: 100%; margin: 8px 0 18px; font-family: var(--font-display); font-size: clamp(27px, 2.5vw, 39px); line-height: 1; text-transform: uppercase; }
+.intro { max-width: 470px; margin-bottom: 28px; color: #aca69e; font-family: var(--font-display); line-height: 1.6; }
+.error { margin-bottom: 22px; padding: 14px 16px; color: #ffd5d5; font-size: 10px; font-weight: 800; border-left: 7px solid var(--red); background: var(--wine); }
+.form { display: flex; flex-direction: column; }
+.form label { margin: 19px 0 8px; color: #c47b7b; font-size: 8px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+.form input { width: 100%; height: 52px; padding: 0 15px; color: var(--white); font-size: 15px; outline: none; border: 1px solid #67615b; border-radius: 0; background: #202020; }
+.form input:focus { border-color: var(--red); box-shadow: inset 6px 0 var(--red); }
+.form button { display: flex; height: 54px; margin-top: 30px; padding: 0 18px; align-items: center; justify-content: space-between; color: var(--white); cursor: pointer; border: 1px solid var(--red); background: var(--wine); font-size: 9px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.form button:hover { background: var(--red); }
+.form button span { font-size: 18px; }
+.testAccess { display: grid; margin-top: 20px; padding: 14px 16px; grid-template-columns: 1fr auto; gap: 5px 18px; border-left: 5px solid var(--red); background: #202020; }
+.testAccess span { color: #bd7777; font-size: 7px; font-weight: 900; letter-spacing: .15em; }
+.testAccess strong { grid-column: 2; grid-row: 1 / 3; align-self: center; font-size: 11px; letter-spacing: .04em; }
+.testAccess small { color: #77716b; font-size: 8px; }
+.visitorButton { display: flex; width:100%; min-height: 74px; margin-top: 16px; padding: 0 20px; align-items: center; justify-content: space-between; color: var(--ink); cursor:pointer; text-align:left; border: 3px solid var(--paper); border-radius:0; background: var(--paper); transition: color .2s ease, background .2s ease; }
+.visitorButton:hover { color: var(--white); background: var(--wine); }
+.visitorButton > span { display: flex; font-family: var(--font-display); font-size: 20px; font-weight: 700; flex-direction: column; gap: 4px; }
+.visitorButton small { font-family: var(--font-body); font-size: 7px; font-weight: 900; letter-spacing: .16em; }
+.visitorButton b { font-size: 25px; }
+.help { margin-top: 24px; color: #77716b; font-size: 9px; letter-spacing: .05em; }
+@media (max-width: 800px) { .page { grid-template-columns: 1fr; } .poster { min-height: 390px; padding: 110px 24px 70px; border-right: 0; border-bottom: 12px solid var(--red); } .posterContent h1 { font-size: 64px; } .formPanel { padding: 65px 24px 85px; } }
+@media (max-width: 800px) { .posterContent h1 { font-size:clamp(48px,15vw,64px);overflow-wrap:anywhere }.formHeader{align-items:flex-start}.formHeader>span{font-size:58px}.formHeader h2{overflow-wrap:anywhere}.loginHeaderLogo{width:62px;height:62px}.visitorButton{gap:18px}.visitorButton>span{font-size:18px} }
+@media (max-width: 390px) { .poster{padding-right:18px;padding-left:18px}.back{left:18px}.posterContent h1{font-size:47px}.formPanel{padding-right:18px;padding-left:18px}.formHeader>span{display:none}.formHeader{display:flex}.loginHeaderLogo{width:50px;height:50px}.visitorButton{padding:15px;align-items:flex-start}.visitorButton>span{font-size:17px} }
+@media (prefers-reduced-motion: reduce) { .page::after { display: none; } }

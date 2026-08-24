@@ -1,0 +1,53 @@
+.intro { display: grid; margin-bottom: 60px; padding: 34px; color: var(--white); background: var(--graphite); grid-template-columns: .8fr 1.2fr; gap: 50px; border-top: 8px solid var(--wine); }
+.intro h2, .listHeader h2 { font-family: var(--font-display); font-size: clamp(34px, 4vw, 52px); line-height: 1; text-transform: uppercase; }
+.introText { max-width: 420px; color: #bdb6ae; font-family: var(--font-display); font-size: 15px; line-height: 1.6; }
+.form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.field { min-width: 0; }
+.field label { display: block; margin-bottom: 7px; color: #d18a8a; font-size: 8px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.field input, .field select { width: 100%; min-height: 44px; padding: 11px 12px; color: var(--white); border: 1px solid #615c57; border-radius: 0; background-color: #1b1b1b; font: inherit; font-size: 11px; }
+.field select { padding-right: 42px; background-image: linear-gradient(45deg, transparent 50%, #d18a8a 50%), linear-gradient(135deg, #d18a8a 50%, transparent 50%); background-position: calc(100% - 17px) 18px, calc(100% - 12px) 18px; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; appearance: none; color-scheme: dark; cursor: pointer; }
+.field select:focus { outline: 2px solid var(--red); outline-offset: 2px; }
+.field select option { color: var(--white); background: #1b1b1b; }
+.wide { grid-column: 1 / -1; }
+.submit { min-height: 46px; padding: 12px 18px; color: var(--white); cursor: pointer; border: 1px solid var(--red); background: var(--wine); font-size: 9px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.submit:hover { background: var(--red); }
+.message { margin-bottom: 25px; padding: 14px 18px; font-size: 10px; font-weight: 800; border-left: 7px solid var(--wine); background: var(--paper-2); }
+.success { color: #335a36; border-left-color: #335a36; }
+.error { color: var(--wine-2); }
+.listHeader { display: flex; margin-bottom: 26px; align-items: end; justify-content: space-between; gap: 24px; }
+.listHeader p { max-width: 440px; color: var(--gray); font-family: var(--font-display); font-size: 14px; line-height: 1.5; }
+.list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 4px solid var(--ink); border-left: 1px solid var(--line); }
+.employee { position: relative; display: grid; min-width: 0; padding: 28px; grid-template-columns: 84px minmax(0, 1fr); gap: 22px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.badge { display: grid; width: 84px; height: 84px; place-items: center; color: var(--white); background: var(--graphite) center / cover no-repeat; font-family: var(--font-display); font-size: 26px; border-left: 7px solid var(--wine); }
+.employeeInfo { min-width: 0; }
+.employeeInfo small { color: var(--red); font-size: 8px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.employeeInfo h3 { margin: 8px 0; overflow-wrap: anywhere; font-family: var(--font-display); font-size: 24px; line-height: 1; }
+.employeeInfo p { color: var(--gray); font-family: var(--font-display); font-size: 13px; line-height: 1.45; }
+.meta { display: flex; margin-top: 17px; padding-top: 13px; align-items: center; justify-content: space-between; gap: 14px; border-top: 1px solid var(--line); }
+.status { color: #335a36; font-size: 8px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.inactive { color: var(--wine-2); }
+.toggle { display: flex; align-items: stretch; gap: 8px; }
+.toggle select { min-height: 34px; padding: 7px 34px 7px 9px; color: var(--ink); border: 1px solid var(--line); border-radius: 0; background-color: var(--paper); background-image: linear-gradient(45deg,transparent 50%,var(--wine-2) 50%),linear-gradient(135deg,var(--wine-2) 50%,transparent 50%); background-position: calc(100% - 14px) 14px,calc(100% - 9px) 14px; background-size:5px 5px;background-repeat:no-repeat;appearance:none;font:inherit;font-size:9px;cursor:pointer; }
+.toggle button { padding: 8px 10px; color: var(--wine-2); cursor: pointer; border: 1px solid var(--wine); background: transparent; font-size: 8px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.toggle button:hover { color: var(--white); background: var(--wine); }
+.empty { padding: 30px; color: var(--gray); border: 1px solid var(--line); }
+
+@media (max-width: 850px) {
+  .intro, .list { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .intro { padding: 24px; gap: 28px; }
+  .form { grid-template-columns: 1fr; }
+  .wide { grid-column: auto; }
+  .listHeader { align-items: flex-start; flex-direction: column; }
+  .employee { grid-template-columns: 66px minmax(0, 1fr); padding: 20px; gap: 15px; }
+  .badge { width: 66px; height: 66px; font-size: 21px; }
+  .meta { align-items: flex-start; flex-direction: column; }
+  .toggle { width: 100%; flex-direction: column; }
+  .toggle select, .toggle button { width: 100%; }
+}
+.employeeInfo h3, .employeeInfo p, .employeeInfo small { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
+.employeeInfo h3, .employeeInfo p { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; }
+.employeeInfo h3 { -webkit-line-clamp: 3; line-clamp: 3; }
+.employeeInfo p { -webkit-line-clamp: 3; line-clamp: 3; }

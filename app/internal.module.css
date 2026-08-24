@@ -1,0 +1,33 @@
+.page { min-height: 100vh; background: var(--paper); }
+.hero { position: relative; overflow: hidden; padding: 155px max(24px, calc((100% - var(--container)) / 2)) 78px; color: var(--white); background-color: var(--ink); background-image: linear-gradient(90deg, transparent 65%, rgba(35,6,6,.7)), url("/guilda-romanov.png"); background-position: center, 88% center; background-size: auto, 260px; background-repeat: no-repeat; border-bottom: 16px solid var(--wine); }
+.hero::after { position: absolute; top: -80%; right: -8%; width: 43%; height: 220%; content: ""; opacity: .78; background: var(--wine); transform: rotate(18deg); }
+.eyebrow { position: relative; z-index: 1; margin-bottom: 20px; color: #c38181; font-size: 9px; font-weight: 900; letter-spacing: .2em; }
+.hero h1 { position: relative; z-index: 1; max-width: 850px; font-family: var(--font-display); font-size: clamp(58px, 8vw, 104px); line-height: .9; text-transform: uppercase; }
+.hero > p:last-child { position: relative; z-index: 1; max-width: 650px; margin-top: 26px; color: #c1bbb3; font-family: var(--font-display); font-size: 17px; line-height: 1.65; }
+.content { width: min(calc(100% - 48px), var(--container)); margin: auto; padding: 78px 0 110px; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 4px solid var(--ink); border-left: 1px solid var(--line); }
+.card { position: relative; display: flex; min-height: 250px; padding: 32px; flex-direction: column; background: transparent; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.card::before { position: absolute; top: 0; left: 0; width: 42px; height: 7px; content: ""; background: var(--red); transform: skew(-25deg); }
+.cardLabel { margin-bottom: 20px; color: var(--red); font-size: 8px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+.card h2 { margin-bottom: 16px; font-family: var(--font-display); font-size: 27px; line-height: 1.05; }
+.card > p:not(.cardLabel) { color: var(--gray); font-family: var(--font-display); font-size: 14px; line-height: 1.6; }
+.cardMeta { display: flex; width: 100%; margin-top: auto; padding-top: 14px; justify-content: space-between; color: var(--gray); font-size: 8px; font-weight: 800; letter-spacing: .08em; border-top: 1px solid var(--line); }
+.grid .card { display: flex; flex-direction: column; }
+.grid .cardMeta { margin-top: auto; }
+.card a, .button { display: inline-block; margin-top: 25px; padding: 12px 15px; color: var(--white); font-size: 8px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; background: var(--wine); border: 1px solid var(--red); }
+.toolbar { display: flex; margin-bottom: 34px; align-items: end; justify-content: space-between; }
+.toolbar h2 { font-family: var(--font-display); font-size: 38px; text-transform: uppercase; }
+.adminNotice { margin-bottom: 35px; padding: 17px 20px; color: var(--wine-2); font-size: 10px; font-weight: 800; letter-spacing: .04em; border-left: 8px solid var(--wine); background: var(--paper-2); }
+.signout { display: flex; margin: -18px 0 28px; justify-content: flex-end; }
+.signout button { padding: 9px 0; color: var(--wine-2); cursor: pointer; border: 0; border-bottom: 2px solid var(--wine); background: transparent; font-size: 8px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.back { display: inline-block; margin-top: 42px; padding-bottom: 6px; color: var(--wine-2); font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; border-bottom: 2px solid var(--wine); }
+@media (max-width: 850px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .hero { padding: 125px 18px 60px; } .content { width: calc(100% - 36px); padding: 55px 0 85px; } .grid { grid-template-columns: 1fr; } .toolbar { align-items: flex-start; flex-direction: column; } }
+@media (max-width: 600px) { .hero { background-position:center,110% center;background-size:auto,170px; }.hero::after{right:-38%;width:70%}.hero h1{font-size:clamp(42px,15vw,62px);overflow-wrap:anywhere}.card{min-height:220px;padding:26px}.toolbar{gap:18px}.toolbar h2{font-size:32px;overflow-wrap:anywhere}.cardMeta{gap:12px;flex-wrap:wrap}.adminNotice{line-height:1.5}.signout{margin-top:0;justify-content:flex-start} }
+.card { min-width: 0; overflow: hidden; }
+.card h2, .card > p, .cardLabel, .cardMeta span { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
+.card h2 { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; }
+.card > p:not(.cardLabel) { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; }
+.cardMeta { min-width: 0; }
+.cardMeta span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 600px) { .cardMeta span { max-width: 100%; white-space: normal; } }

@@ -1,0 +1,32 @@
+.dialog {
+  position: fixed;
+  inset: 0;
+  width: min(520px, calc(100% - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  color: var(--white);
+  border: 1px solid #706a63;
+  border-top: 6px solid var(--red);
+  background: var(--graphite);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, .55);
+}
+
+.dialog::backdrop { background: rgba(10, 8, 8, .76); backdrop-filter: blur(3px); }
+.panel { padding: 34px; }
+.eyebrow { margin-bottom: 14px; color: #d68686; font-size: 9px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
+.panel h2 { font-family: var(--font-display); font-size: clamp(28px, 5vw, 42px); line-height: 1; text-transform: uppercase; }
+.message { margin-top: 20px; color: #cbc4bb; font-family: var(--font-display); font-size: 17px; line-height: 1.55; overflow-wrap: anywhere; }
+.actions { display: flex; margin-top: 30px; justify-content: flex-end; gap: 12px; }
+.dialog .actions button { width: auto; min-height: 44px; height: auto; padding: 12px 18px; color: var(--white); font: inherit; font-size: 9px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+.dialog .cancel { border: 1px solid #8a837b; background: transparent; }
+.dialog .confirm { border: 1px solid var(--red); background: var(--wine); }
+.actions button:hover { border-color: #df7777; }
+
+@media (max-width: 520px) {
+  .panel { padding: 26px 22px; }
+  .actions { align-items: stretch; flex-direction: column-reverse; }
+  .actions button { width: 100%; }
+}

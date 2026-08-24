@@ -1,0 +1,12 @@
+create table if not exists public.reports (id uuid primary key default gen_random_uuid(),title text not null,report_date date not null,summary text not null,document_url text not null,author_employee_id uuid not null references public.employees(id),created_by uuid not null default auth.uid() references auth.users(id),created_at timestamptz not null default now(),updated_at timestamptz not null default now(),constraint reports_title_length check (char_length(title) between 2 and 140),constraint reports_summary_length check (char_length(summary) between 2 and 5000),constraint reports_document_url check (document_url ~ '^https?://'));
+alter table public.reports enable row level security;
+grant select,insert,update,delete on public.reports to authenticated;
+drop policy if exists "Usuarios autenticados visualizam relatorios" on public.reports;
+create policy "Usuarios autenticados visualizam relatorios" on public.reports for select to authenticated using (true);
+drop policy if exists "Administradores criam relatorios" on public.reports;
+create policy "Administradores criam relatorios" on public.reports for insert to authenticated with check ((select private.is_admin()));
+drop policy if exists "Administradores atualizam relatorios" on public.reports;
+create policy "Administradores atualizam relatorios" on public.reports for update to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
+drop policy if exists "Administradores excluem relatorios" on public.reports;
+create policy "Administradores excluem relatorios" on public.reports for delete to authenticated using ((select private.is_admin()));
+create index if not exists reports_date_idx on public.reports(report_date desc);

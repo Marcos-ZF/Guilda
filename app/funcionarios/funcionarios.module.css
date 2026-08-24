@@ -1,0 +1,37 @@
+.roster { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
+.card { position: relative; display: grid; min-width: 0; min-height: 0; aspect-ratio: 1.488; overflow: hidden; color: var(--white); background: var(--graphite); grid-template-columns: 42% 58%; border: 1px solid #414141; }
+.card::after { position: absolute; right: -42px; bottom: -55px; width: 170px; height: 110px; content: ""; background: var(--wine); transform: rotate(-35deg); }
+.portrait { position: relative; display: grid; overflow: hidden; place-items: center; background: linear-gradient(145deg, #3a3937, #171717) center / cover no-repeat; border-right: 8px solid var(--wine); }
+.portrait:not(:has(.initials))::before,.portrait:not(:has(.initials))::after{display:none}.portrait::before { position: absolute; top: 17%; left: 50%; width: 38%; aspect-ratio: 1; content: ""; transform: translateX(-50%); border-radius: 48% 48% 42% 42%; background: #292827; }
+.portrait::after { position: absolute; right: -22%; bottom: -27%; left: -22%; height: 70%; content: ""; border-radius: 50% 50% 0 0; background: #292827; }
+.initials { position: relative; z-index: 2; font-family: var(--font-display); font-size: 54px; color: #a9a198; text-shadow: 3px 3px 0 var(--wine); }
+.number { position: absolute; z-index: 3; top: 18px; left: 18px; font-size: 10px; font-weight: 900; letter-spacing: .14em; }
+.info { position: relative; z-index: 2; display: flex; min-width: 0; overflow: hidden; padding: 42px 30px; justify-content: center; flex-direction: column; }
+.role { margin-bottom: 18px; color: #c68080; font-size: 9px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
+.info h2 { max-width: 100%; margin-bottom: 20px; overflow-wrap: anywhere; word-break: normal; font-family: var(--font-display); font-size: clamp(22px, 2vw, 32px); line-height: 1.02; letter-spacing: -.025em; text-transform: uppercase; }
+.specialty { max-width: 100%; padding-top: 18px; overflow-wrap: anywhere; color: #aaa49d; font-size: 10px; font-weight: 800; letter-spacing: .08em; line-height: 1.45; text-transform: uppercase; border-top: 1px solid #625d58; }
+.open { position: absolute; z-index: 4; right: 24px; bottom: 20px; color: #d18a8a; font-size: 8px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.card { transition: transform .2s ease, border-color .2s ease; }
+.card:hover { border-color: var(--red); transform: translateY(-3px); }
+@media (max-width: 900px) { .roster { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .card { min-height: 520px; aspect-ratio: auto; grid-template-columns: 1fr; grid-template-rows: 58% 42%; } .portrait { border-right: 0; border-bottom: 8px solid var(--wine); } .info { padding: 26px; } }
+@media (max-width: 520px) { .roster{gap:18px}.card{min-height:470px;grid-template-rows:55% 45%}.info{padding:24px 22px 42px;justify-content:flex-start}.info h2{font-size:26px}.open{right:20px;bottom:18px} }
+.role, .info h2, .specialty { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
+.role, .specialty { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; }
+.role { -webkit-line-clamp: 2; line-clamp: 2; }
+.info h2 { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; }
+.specialty { -webkit-line-clamp: 3; line-clamp: 3; }
+.empty { grid-column: 1 / -1; padding: 36px; color: var(--gray); text-align: center; border: 1px solid var(--line); }
+.memorialDivider { width: 100%; height: 18px; margin: 82px 0 0; background: var(--wine); }
+.memorial { padding-top: 72px; }
+.memorial > p { color: var(--red); font-size: 9px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
+.memorial > h2 { margin: 10px 0 12px; font-family: var(--font-display); font-size: clamp(46px, 6vw, 76px); line-height: 1; text-transform: uppercase; }
+.memorial > span { display: block; max-width: 620px; color: var(--gray); font-family: var(--font-display); font-size: 17px; line-height: 1.6; }
+.memorialRoster { margin-top: 38px; }
+.memorialCard { border-color: var(--wine-2); filter: saturate(.68); }
+.memorialCard .portrait { border-right-color: #3b0707; }
+.memorialCard .role, .memorialCard .open { color: #d6a1a1; }
+.inactiveCard { border-color: #777069; filter: grayscale(.72) saturate(.45); opacity: .78; }
+.inactiveCard::before { position: absolute; z-index: 5; top: 14px; right: 14px; padding: 6px 8px; content: "INATIVO"; color: #e5ded5; background: rgba(35,6,6,.88); font-size: 7px; font-weight: 900; letter-spacing: .15em; border: 1px solid #8c6d6d; }
+.inactiveCard:hover { opacity: 1; filter: grayscale(.3) saturate(.65); }
+@media (max-width: 520px) { .memorialDivider { margin-top: 62px; } .memorial { padding-top: 52px; } }
