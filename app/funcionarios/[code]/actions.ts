@@ -27,6 +27,72 @@ async function uploadImage(employeeId: string, file: File, folder: string) {
   if (error) throw error;
   return supabase.storage.from("employee-media").getPublicUrl(path).data.publicUrl;
 }
+
+async function reorderEquipment(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  employeeId: string,
+  itemId: string,
+  requestedPosition: number,
+) {
+  const { data, error } = await supabase
+    .from("employee_equipment")
+    .select("id")
+    .eq("employee_id", employeeId)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  if (error) throw error;
+
+  const orderedIds = (data ?? []).map((row) => String(row.id)).filter((id) => id !== itemId);
+  const targetIndex = Math.min(Math.max(requestedPosition - 1, 0), orderedIds.length);
+  orderedIds.splice(targetIndex, 0, itemId);
+
+  const results = await Promise.all(
+    orderedIds.map((id, index) =>
+      supabase
+        .from("employee_equipment")
+        .update({ sort_order: index + 1 })
+        .eq("id", id)
+        .eq("employee_id", employeeId),
+    ),
+  );
+
+  const reorderError = results.find((result) => result.error)?.error;
+  if (reorderError) throw reorderError;
+}
+
+async function reorderAchievements(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  employeeId: string,
+  itemId: string,
+  requestedPosition: number,
+) {
+  const { data, error } = await supabase
+    .from("employee_achievements")
+    .select("id")
+    .eq("employee_id", employeeId)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  if (error) throw error;
+
+  const orderedIds = (data ?? []).map((row) => String(row.id)).filter((id) => id !== itemId);
+  const targetIndex = Math.min(Math.max(requestedPosition - 1, 0), orderedIds.length);
+  orderedIds.splice(targetIndex, 0, itemId);
+
+  const results = await Promise.all(
+    orderedIds.map((id, index) =>
+      supabase
+        .from("employee_achievements")
+        .update({ sort_order: index + 1 })
+        .eq("id", id)
+        .eq("employee_id", employeeId),
+    ),
+  );
+
+  const reorderError = results.find((result) => result.error)?.error;
+  if (reorderError) throw reorderError;
+}
 export async function updateEmployeeProfile(formData: FormData) {
   const employeeId = String(formData.get("employee_id") ?? ""), code = String(formData.get("code") ?? "");
   const name = String(formData.get("name") ?? "").trim(), roleTitle = String(formData.get("role_title") ?? "").trim();
@@ -118,24 +184,30 @@ export async function addEquipment(formData: FormData) {
   const employeeId = String(formData.get("employee_id") ?? ""), code = String(formData.get("code") ?? "");
   const name = String(formData.get("name") ?? "").trim(), itemType = String(formData.get("item_type") ?? "").trim(), description = String(formData.get("description") ?? "").trim();
   const rarity = String(formData.get("rarity") ?? "").trim();
+  const position = Number(String(formData.get("sort_order") ?? ""));
   const documentUrl = String(formData.get("document_url") ?? "").trim();
   const image = formData.get("image"), { supabase } = await requireManager(employeeId);
-  if (!name || !equipmentTypes.has(itemType) || !equipmentRarities.has(rarity) || name.length > 100 || description.length > 1000 || (documentUrl && !/^https?:\/\//i.test(documentUrl))) redirect(`/funcionarios/${code}?erro=dados#editar`);
+  if (!name || !equipmentTypes.has(itemType) || !equipmentRarities.has(rarity) || !Number.isInteger(position) || position < 1 || position > 9999 || name.length > 100 || description.length > 1000 || (documentUrl && !/^https?:\/\//i.test(documentUrl))) redirect(`/funcionarios/${code}?erro=dados#editar`);
   let imageUrl: string | null = null;
   try { if (image instanceof File && image.size) imageUrl = await uploadImage(employeeId, image, "equipment"); }
   catch { redirect(`/funcionarios/${code}?erro=imagem#editar`); }
-  const { error } = await supabase.from("employee_equipment").insert({ employee_id: employeeId, name, item_type: itemType, rarity, description, image_url: imageUrl, document_url: documentUrl || null });
-  if (error) redirect(`/funcionarios/${code}?erro=salvar#editar`);
+  const { data: inserted, error } = await supabase.from("employee_equipment").insert({ employee_id: employeeId, name, item_type: itemType, rarity, description, image_url: imageUrl, document_url: documentUrl || null, sort_order: position }).select("id").single<{ id: string }>();
+  if (error || !inserted) redirect(`/funcionarios/${code}?erro=salvar#editar`);
+  try { await reorderEquipment(supabase, employeeId, inserted.id, position); }
+  catch { redirect(`/funcionarios/${code}?erro=salvar#editar`); }
   revalidatePath(`/funcionarios/${code}`); redirect(`/funcionarios/${code}?salvo=1#equipamentos`);
 }
 export async function addAchievement(formData: FormData) {
   await requireRole(["admin"]);
   const employeeId = String(formData.get("employee_id") ?? ""), code = String(formData.get("code") ?? "");
   const title = String(formData.get("title") ?? "").trim(), description = String(formData.get("description") ?? "").trim();
+  const position = Number(String(formData.get("sort_order") ?? ""));
   const { supabase } = await requireManager(employeeId);
-  if (!title || title.length > 140 || description.length > 1000) redirect(`/funcionarios/${code}?erro=dados#editar`);
-  const { error } = await supabase.from("employee_achievements").insert({ employee_id: employeeId, title, description });
-  if (error) redirect(`/funcionarios/${code}?erro=salvar#editar`);
+  if (!title || !Number.isInteger(position) || position < 1 || position > 9999 || title.length > 140 || description.length > 1000) redirect(`/funcionarios/${code}?erro=dados#editar`);
+  const { data: inserted, error } = await supabase.from("employee_achievements").insert({ employee_id: employeeId, title, description, sort_order: position }).select("id").single<{ id: string }>();
+  if (error || !inserted) redirect(`/funcionarios/${code}?erro=salvar#editar`);
+  try { await reorderAchievements(supabase, employeeId, inserted.id, position); }
+  catch { redirect(`/funcionarios/${code}?erro=salvar#editar`); }
   revalidatePath(`/funcionarios/${code}`); revalidatePath("/"); redirect(`/funcionarios/${code}?salvo=1#feitos`);
 }
 
@@ -143,13 +215,16 @@ export async function updateEquipment(formData: FormData) {
   const employeeId = String(formData.get("employee_id") ?? ""), code = String(formData.get("code") ?? ""), itemId = String(formData.get("item_id") ?? "");
   const name = String(formData.get("name") ?? "").trim(), itemType = String(formData.get("item_type") ?? "").trim(), description = String(formData.get("description") ?? "").trim(), documentUrl = String(formData.get("document_url") ?? "").trim();
   const rarity = String(formData.get("rarity") ?? "").trim();
+  const position = Number(String(formData.get("sort_order") ?? ""));
   const image = formData.get("image"), { supabase } = await requireManager(employeeId);
-  if (!/^[0-9a-f-]{36}$/i.test(itemId) || !name || !equipmentTypes.has(itemType) || !equipmentRarities.has(rarity) || name.length > 100 || description.length > 1000 || (documentUrl && !/^https?:\/\//i.test(documentUrl))) redirect(`/funcionarios/${code}?erro=dados#equipamentos`);
+  if (!/^[0-9a-f-]{36}$/i.test(itemId) || !name || !equipmentTypes.has(itemType) || !equipmentRarities.has(rarity) || !Number.isInteger(position) || position < 1 || position > 9999 || name.length > 100 || description.length > 1000 || (documentUrl && !/^https?:\/\//i.test(documentUrl))) redirect(`/funcionarios/${code}?erro=dados#equipamentos`);
   const update: Record<string, unknown> = { name, item_type: itemType, rarity, description, document_url: documentUrl || null };
   try { if (image instanceof File && image.size) update.image_url = await uploadImage(employeeId, image, "equipment"); }
   catch { redirect(`/funcionarios/${code}?erro=imagem#equipamentos`); }
   const { error } = await supabase.from("employee_equipment").update(update).eq("id", itemId).eq("employee_id", employeeId);
   if (error) redirect(`/funcionarios/${code}?erro=salvar#equipamentos`);
+  try { await reorderEquipment(supabase, employeeId, itemId, position); }
+  catch { redirect(`/funcionarios/${code}?erro=salvar#equipamentos`); }
   revalidatePath(`/funcionarios/${code}`); redirect(`/funcionarios/${code}?salvo=1#equipamentos`);
 }
 
@@ -157,10 +232,13 @@ export async function updateAchievement(formData: FormData) {
   await requireRole(["admin"]);
   const employeeId = String(formData.get("employee_id") ?? ""), code = String(formData.get("code") ?? ""), itemId = String(formData.get("item_id") ?? "");
   const title = String(formData.get("title") ?? "").trim(), description = String(formData.get("description") ?? "").trim();
+  const position = Number(String(formData.get("sort_order") ?? ""));
   const { supabase } = await requireManager(employeeId);
-  if (!/^[0-9a-f-]{36}$/i.test(itemId) || !title || title.length > 140 || description.length > 1000) redirect(`/funcionarios/${code}?erro=dados#feitos`);
+  if (!/^[0-9a-f-]{36}$/i.test(itemId) || !title || !Number.isInteger(position) || position < 1 || position > 9999 || title.length > 140 || description.length > 1000) redirect(`/funcionarios/${code}?erro=dados#feitos`);
   const { error } = await supabase.from("employee_achievements").update({ title, description }).eq("id", itemId).eq("employee_id", employeeId);
   if (error) redirect(`/funcionarios/${code}?erro=salvar#feitos`);
+  try { await reorderAchievements(supabase, employeeId, itemId, position); }
+  catch { redirect(`/funcionarios/${code}?erro=salvar#feitos`); }
   revalidatePath(`/funcionarios/${code}`); revalidatePath("/"); redirect(`/funcionarios/${code}?salvo=1#feitos`);
 }
 export async function removeEmployeeItem(formData: FormData) {
