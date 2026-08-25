@@ -16,6 +16,7 @@ import {
 import ImageCropInput from "@/app/components/ImageCropInput";
 import ConfirmSubmitButton from "@/app/components/ConfirmSubmitButton";
 import { AchievementEditModal, EquipmentEditModal } from "./EmployeeItemEditModal";
+import EquipmentTypeRarityFields, { getEquipmentRarityLabel, type EquipmentRarity, type EquipmentType } from "./EquipmentTypeRarityFields";
 import styles from "./profile.module.css";
 
 type Props = {
@@ -51,8 +52,8 @@ type Employee = {
 type Equipment = {
   id: string;
   name: string;
-  item_type: string;
-  rarity: "Comum" | "Lendária";
+  item_type: EquipmentType;
+  rarity: EquipmentRarity;
   description: string;
   image_url: string | null;
   document_url: string | null;
@@ -209,7 +210,7 @@ export default async function EmployeeProfilePage({ params, searchParams }: Prop
                 <strong>{String(index + 1).padStart(2, "0")}</strong>
                 <div className={styles.equipmentImage} style={item.image_url ? { backgroundImage: `url("${item.image_url}")` } : undefined} />
                 <div className={styles.equipmentBody}>
-                  <small>{item.item_type} · {item.rarity}</small>
+                  <small>{item.item_type} · {getEquipmentRarityLabel(item.item_type, item.rarity)}</small>
                   <h3>{item.name}</h3>
                   <p>{item.description}</p>
                   {item.document_url && <a className={styles.documentLink} href={item.document_url} target="_blank" rel="noreferrer">Documento do Equipamento ↗</a>}
@@ -292,8 +293,7 @@ export default async function EmployeeProfilePage({ params, searchParams }: Prop
                   <form className={styles.form} action={addEquipment}>
                     <Hidden />
                     <label>Nome</label><input name="name" required />
-                    <label>Tipo</label><select name="item_type" defaultValue="Arma" required><option>Arma</option><option>Acessório</option><option>Armadura</option></select>
-                    <label>Raridade</label><select name="rarity" defaultValue="Comum" required><option>Comum</option><option>Lendária</option></select>
+                    <EquipmentTypeRarityFields />
                     <label>Descrição</label><textarea name="description" />
                     <label>Link de Doc (opcional)</label><input name="document_url" type="url" placeholder="https://docs.google.com/..." />
                     <ImageCropInput name="image" label="Foto da arma/equipamento" aspect={4 / 3} />
