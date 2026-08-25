@@ -8,6 +8,7 @@ const imageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"
 const sexes = new Set(["", "Feminino", "Masculino"]);
 const honorTitles = new Set(["", "Katyusha", "Ilya", "Dobrynya", "Alyosha", "Rasputin", "Baba Yaga", "Vasilisa"]);
 const equipmentTypes = new Set(["Arma", "Acessório", "Armadura"]);
+const equipmentRarities = new Set(["Comum", "Lendária"]);
 const employeeStatuses = new Set(["active", "inactive", "deceased"]);
 async function requireManager(employeeId: string) {
   const profile = await requireRole(["funcionario", "admin"]);
@@ -116,13 +117,14 @@ export async function updateEmployeeMemorial(formData: FormData) {
 export async function addEquipment(formData: FormData) {
   const employeeId = String(formData.get("employee_id") ?? ""), code = String(formData.get("code") ?? "");
   const name = String(formData.get("name") ?? "").trim(), itemType = String(formData.get("item_type") ?? "").trim(), description = String(formData.get("description") ?? "").trim();
+  const rarity = String(formData.get("rarity") ?? "").trim();
   const documentUrl = String(formData.get("document_url") ?? "").trim();
   const image = formData.get("image"), { supabase } = await requireManager(employeeId);
-  if (!name || !equipmentTypes.has(itemType) || name.length > 100 || description.length > 1000 || (documentUrl && !/^https?:\/\//i.test(documentUrl))) redirect(`/funcionarios/${code}?erro=dados#editar`);
+  if (!name || !equipmentTypes.has(itemType) || !equipmentRarities.has(rarity) || name.length > 100 || description.length > 1000 || (documentUrl && !/^https?:\/\//i.test(documentUrl))) redirect(`/funcionarios/${code}?erro=dados#editar`);
   let imageUrl: string | null = null;
   try { if (image instanceof File && image.size) imageUrl = await uploadImage(employeeId, image, "equipment"); }
   catch { redirect(`/funcionarios/${code}?erro=imagem#editar`); }
-  const { error } = await supabase.from("employee_equipment").insert({ employee_id: employeeId, name, item_type: itemType, description, image_url: imageUrl, document_url: documentUrl || null });
+  const { error } = await supabase.from("employee_equipment").insert({ employee_id: employeeId, name, item_type: itemType, rarity, description, image_url: imageUrl, document_url: documentUrl || null });
   if (error) redirect(`/funcionarios/${code}?erro=salvar#editar`);
   revalidatePath(`/funcionarios/${code}`); redirect(`/funcionarios/${code}?salvo=1#equipamentos`);
 }
@@ -140,9 +142,10 @@ export async function addAchievement(formData: FormData) {
 export async function updateEquipment(formData: FormData) {
   const employeeId = String(formData.get("employee_id") ?? ""), code = String(formData.get("code") ?? ""), itemId = String(formData.get("item_id") ?? "");
   const name = String(formData.get("name") ?? "").trim(), itemType = String(formData.get("item_type") ?? "").trim(), description = String(formData.get("description") ?? "").trim(), documentUrl = String(formData.get("document_url") ?? "").trim();
+  const rarity = String(formData.get("rarity") ?? "").trim();
   const image = formData.get("image"), { supabase } = await requireManager(employeeId);
-  if (!/^[0-9a-f-]{36}$/i.test(itemId) || !name || !equipmentTypes.has(itemType) || name.length > 100 || description.length > 1000 || (documentUrl && !/^https?:\/\//i.test(documentUrl))) redirect(`/funcionarios/${code}?erro=dados#equipamentos`);
-  const update: Record<string, unknown> = { name, item_type: itemType, description, document_url: documentUrl || null };
+  if (!/^[0-9a-f-]{36}$/i.test(itemId) || !name || !equipmentTypes.has(itemType) || !equipmentRarities.has(rarity) || name.length > 100 || description.length > 1000 || (documentUrl && !/^https?:\/\//i.test(documentUrl))) redirect(`/funcionarios/${code}?erro=dados#equipamentos`);
+  const update: Record<string, unknown> = { name, item_type: itemType, rarity, description, document_url: documentUrl || null };
   try { if (image instanceof File && image.size) update.image_url = await uploadImage(employeeId, image, "equipment"); }
   catch { redirect(`/funcionarios/${code}?erro=imagem#equipamentos`); }
   const { error } = await supabase.from("employee_equipment").update(update).eq("id", itemId).eq("employee_id", employeeId);
