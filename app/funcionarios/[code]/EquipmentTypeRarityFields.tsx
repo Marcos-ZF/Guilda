@@ -1,21 +1,12 @@
 "use client";
 
 import { useId, useState } from "react";
-
-export type EquipmentType = "Arma" | "Acessório" | "Armadura";
-export type EquipmentRarity = "common" | "rare" | "epic" | "legendary";
-
-const rarityLabels: Record<EquipmentRarity, { feminine: string; masculine: string }> = {
-  common: { feminine: "Comum", masculine: "Comum" },
-  rare: { feminine: "Rara", masculine: "Raro" },
-  epic: { feminine: "Épica", masculine: "Épico" },
-  legendary: { feminine: "Lendária", masculine: "Lendário" },
-};
-
-export function getEquipmentRarityLabel(itemType: string, rarity: string) {
-  const labels = rarityLabels[rarity as EquipmentRarity] ?? rarityLabels.common;
-  return itemType === "Acessório" ? labels.masculine : labels.feminine;
-}
+import {
+  equipmentRarityValues,
+  getEquipmentRarityLabel,
+  type EquipmentRarity,
+  type EquipmentType,
+} from "./equipment-rarity";
 
 type Props = {
   defaultItemType?: EquipmentType;
@@ -31,7 +22,7 @@ export default function EquipmentTypeRarityFields({
   const [itemType, setItemType] = useState<EquipmentType>(defaultItemType);
   const typeId = useId();
   const rarityId = useId();
-  const rarityOptions = (Object.keys(rarityLabels) as EquipmentRarity[]).map((value) => ({
+  const rarityOptions = equipmentRarityValues.map((value) => ({
     value,
     label: getEquipmentRarityLabel(itemType, value),
   }));

@@ -16,7 +16,8 @@ import {
 import ImageCropInput from "@/app/components/ImageCropInput";
 import ConfirmSubmitButton from "@/app/components/ConfirmSubmitButton";
 import { AchievementEditModal, EquipmentEditModal } from "./EmployeeItemEditModal";
-import EquipmentTypeRarityFields, { getEquipmentRarityLabel, type EquipmentRarity, type EquipmentType } from "./EquipmentTypeRarityFields";
+import EquipmentTypeRarityFields from "./EquipmentTypeRarityFields";
+import { getEquipmentRarityLabel, type EquipmentRarity, type EquipmentType } from "./equipment-rarity";
 import styles from "./profile.module.css";
 
 type Props = {
@@ -296,7 +297,7 @@ export default async function EmployeeProfilePage({ params, searchParams }: Prop
                     <EquipmentTypeRarityFields />
                     <label>Descrição</label><textarea name="description" />
                     <label>Link de Doc (opcional)</label><input name="document_url" type="url" placeholder="https://docs.google.com/..." />
-                    <ImageCropInput name="image" label="Foto da arma/equipamento" aspect={4 / 3} />
+                    <ImageCropInput name="image" label="Foto da arma/equipamento" aspect={4 / 3} fit="contain" />
                     <button>Adicionar equipamento</button>
                   </form>
                 </section>

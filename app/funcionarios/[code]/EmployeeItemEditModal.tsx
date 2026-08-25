@@ -3,7 +3,8 @@
 import { useRef } from "react";
 import ImageCropInput from "@/app/components/ImageCropInput";
 import { updateAchievement, updateEquipment } from "./actions";
-import EquipmentTypeRarityFields, { type EquipmentRarity, type EquipmentType } from "./EquipmentTypeRarityFields";
+import EquipmentTypeRarityFields from "./EquipmentTypeRarityFields";
+import { type EquipmentRarity, type EquipmentType } from "./equipment-rarity";
 import styles from "./item-edit-modal.module.css";
 
 type Equipment = { id: string; name: string; item_type: EquipmentType; rarity: EquipmentRarity; description: string; image_url: string | null; document_url: string | null };
@@ -12,7 +13,7 @@ type Common = { employeeId: string; code: string };
 
 export function EquipmentEditModal({ employeeId, code, item }: Common & { item: Equipment }) {
   const dialog = useRef<HTMLDialogElement>(null);
-  return <><button className={styles.open} type="button" onClick={() => dialog.current?.showModal()}>Editar</button><dialog className={styles.modal} ref={dialog} onClick={event => { if (event.target === dialog.current) dialog.current.close(); }}><div className={styles.panel}><Header title="Editar equipamento" close={() => dialog.current?.close()} /><form className={styles.form} action={updateEquipment}><Hidden employeeId={employeeId} code={code} itemId={item.id} /><label>Nome<input name="name" defaultValue={item.name} required /></label><EquipmentTypeRarityFields defaultItemType={item.item_type} defaultRarity={item.rarity} nestedLabels /><label className={styles.wide}>Descrição<textarea name="description" defaultValue={item.description} /></label><label className={styles.wide}>Link de Doc (opcional)<input name="document_url" type="url" defaultValue={item.document_url ?? ""} placeholder="https://docs.google.com/..." /></label><div className={styles.wide}><ImageCropInput name="image" label="Trocar foto do equipamento (opcional)" aspect={4 / 3} /></div><Actions close={() => dialog.current?.close()} /></form></div></dialog></>;
+  return <><button className={styles.open} type="button" onClick={() => dialog.current?.showModal()}>Editar</button><dialog className={styles.modal} ref={dialog} onClick={event => { if (event.target === dialog.current) dialog.current.close(); }}><div className={styles.panel}><Header title="Editar equipamento" close={() => dialog.current?.close()} /><form className={styles.form} action={updateEquipment}><Hidden employeeId={employeeId} code={code} itemId={item.id} /><label>Nome<input name="name" defaultValue={item.name} required /></label><EquipmentTypeRarityFields defaultItemType={item.item_type} defaultRarity={item.rarity} nestedLabels /><label className={styles.wide}>Descrição<textarea name="description" defaultValue={item.description} /></label><label className={styles.wide}>Link de Doc (opcional)<input name="document_url" type="url" defaultValue={item.document_url ?? ""} placeholder="https://docs.google.com/..." /></label><div className={styles.wide}><ImageCropInput name="image" label="Trocar foto do equipamento (opcional)" aspect={4 / 3} fit="contain" /></div><Actions close={() => dialog.current?.close()} /></form></div></dialog></>;
 }
 
 export function AchievementEditModal({ employeeId, code, item }: Common & { item: Achievement }) {

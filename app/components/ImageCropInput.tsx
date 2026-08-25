@@ -10,6 +10,7 @@ type Props = {
   aspect?: number;
   outputWidth?: number;
   quality?: number;
+  fit?: "cover" | "contain";
 };
 
 export default function ImageCropInput({
@@ -18,6 +19,7 @@ export default function ImageCropInput({
   aspect = 1,
   outputWidth = 1000,
   quality = .9,
+  fit = "cover",
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -64,7 +66,8 @@ export default function ImageCropInput({
     const image = imageRef.current, crop = cropRef.current;
     if (!image || !crop) return;
     const rect = crop.getBoundingClientRect();
-    const base = Math.max(rect.width / image.naturalWidth, rect.height / image.naturalHeight);
+    const scales = [rect.width / image.naturalWidth, rect.height / image.naturalHeight];
+    const base = fit === "contain" ? Math.min(...scales) : Math.max(...scales);
     setBaseSize({ width: image.naturalWidth * base, height: image.naturalHeight * base });
   }
 
@@ -76,7 +79,8 @@ export default function ImageCropInput({
     const context = canvas.getContext("2d"); if (!context) return;
     context.imageSmoothingEnabled = true;
     context.imageSmoothingQuality = "high";
-    const base = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+    const scales = [width / image.naturalWidth, height / image.naturalHeight];
+    const base = fit === "contain" ? Math.min(...scales) : Math.max(...scales);
     const scale = base * zoom, drawWidth = image.naturalWidth * scale, drawHeight = image.naturalHeight * scale;
     const previewWidth = cropRef.current?.getBoundingClientRect().width || width;
     const ratio = width / previewWidth;
