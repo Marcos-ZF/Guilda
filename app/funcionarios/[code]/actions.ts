@@ -8,7 +8,7 @@ const imageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"
 const sexes = new Set(["", "Feminino", "Masculino"]);
 const honorTitles = new Set(["", "Katyusha", "Ilya", "Dobrynya", "Alyosha", "Rasputin", "Baba Yaga", "Vasilisa"]);
 const equipmentTypes = new Set(["Arma", "Acessório", "Armadura"]);
-const equipmentRarities = new Set(["common", "rare", "epic", "legendary"]);
+const equipmentRarities = new Set(["common", "rare", "epic", "cursed", "legendary"]);
 const employeeStatuses = new Set(["active", "inactive", "deceased"]);
 async function requireManager(employeeId: string) {
   const profile = await requireRole(["funcionario", "admin"]);

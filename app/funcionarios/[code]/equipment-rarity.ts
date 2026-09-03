@@ -1,10 +1,11 @@
 export type EquipmentType = "Arma" | "Acessório" | "Armadura";
-export type EquipmentRarity = "common" | "rare" | "epic" | "legendary";
+export type EquipmentRarity = "common" | "rare" | "epic" | "cursed" | "legendary";
 
 const rarityLabels: Record<EquipmentRarity, { feminine: string; masculine: string }> = {
   common: { feminine: "Comum", masculine: "Comum" },
   rare: { feminine: "Rara", masculine: "Raro" },
   epic: { feminine: "Épica", masculine: "Épico" },
+  cursed: { feminine: "Amaldiçoada", masculine: "Amaldiçoado" },
   legendary: { feminine: "Lendária", masculine: "Lendário" },
 };
 
