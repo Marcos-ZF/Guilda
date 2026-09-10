@@ -38,10 +38,12 @@ const errorMessages: Record<string, string> = {
   dados: "Confira os dados da movimentação e informe ao menos uma quantia.",
   salvar: "Não foi possível salvar a movimentação.",
   excluir: "Não foi possível excluir a movimentação.",
+  permissao: "É necessário ter um personagem vinculado para registrar uma entrada em seu nome.",
 };
 
 export default async function TreasuryPage({ searchParams }: Props) {
-  await requireRole(["admin"]);
+  const current = await requireRole(["admin", "funcionario"]);
+  const isAdmin = current.role === "admin";
   const params = await searchParams;
   const supabase = await createClient();
 
@@ -51,7 +53,7 @@ export default async function TreasuryPage({ searchParams }: Props) {
     { data: employeeData, error: employeeError },
   ] =
     await Promise.all([
-      supabase
+      isAdmin ? supabase
         .from("treasury_transactions")
         .select(
           "id,movement_type,transaction_date,bronze,prata,ouro,platina,counterparty,description,created_at,creator:profiles!treasury_transactions_created_by_fkey(display_name,email)",
@@ -59,19 +61,23 @@ export default async function TreasuryPage({ searchParams }: Props) {
         .order("transaction_date", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(500)
-        .returns<TransactionRow[]>(),
+        .returns<TransactionRow[]>() : Promise.resolve({ data: [], error: null }),
       supabase.rpc("treasury_balances").maybeSingle<TreasuryBalances>(),
-      supabase
+      isAdmin ? supabase
         .from("employees")
         .select("id,code,name")
         .order("name", { ascending: true })
-        .returns<TreasuryEmployeeOption[]>(),
+        .returns<TreasuryEmployeeOption[]>() : current.employee_id
+          ? supabase.from("employees").select("id,code,name")
+              .eq("code", current.employee_id).returns<TreasuryEmployeeOption[]>()
+          : Promise.resolve({ data: [], error: null }),
     ]);
 
   const hasStructureError = Boolean(transactionError || balanceError || employeeError);
   const balances = balanceData ?? zeroBalances;
   const transactions: TreasuryTransaction[] = transactionData ?? [];
   const employees: TreasuryEmployeeOption[] = employeeData ?? [];
+  const ownEmployee = !isAdmin ? employees[0] : undefined;
   const today = new Date().toLocaleDateString("en-CA", {
     timeZone: "America/Sao_Paulo",
   });
@@ -101,12 +107,14 @@ export default async function TreasuryPage({ searchParams }: Props) {
               <p>SALDO CONSOLIDADO</p>
               <h2>Caixa da Companhia</h2>
             </div>
-            {!hasStructureError && <TreasuryModal today={today} employees={employees} />}
+            {!hasStructureError && (isAdmin || ownEmployee) && (
+              <TreasuryModal today={today} employees={isAdmin ? employees : []} ownEmployee={ownEmployee} />
+            )}
           </div>
 
           {hasStructureError && (
             <p className={`${styles.message} ${styles.error}`}>
-              A estrutura da Tesouraria ainda não existe no Supabase. Execute o novo arquivo SQL entregue junto do projeto.
+              Não foi possível carregar a Tesouraria. Tente novamente; se o problema persistir, avise a administração.
             </p>
           )}
           {(params.criado || params.salvo || params.excluido) && (
@@ -130,7 +138,7 @@ export default async function TreasuryPage({ searchParams }: Props) {
                 <small>{String(index + 1).padStart(2, "0")} / MOEDA</small>
                 <h3>{currency.label}</h3>
                 <strong className={Number(currency.value) < 0 ? styles.negative : undefined}>
-                  {numberFormatter.format(Number(currency.value))}
+                  {hasStructureError ? "—" : numberFormatter.format(Number(currency.value))}
                 </strong>
               </article>
             ))}
@@ -140,12 +148,20 @@ export default async function TreasuryPage({ searchParams }: Props) {
             Os saldos são calculados automaticamente pelas entradas e saídas. Cada tipo de Elo permanece independente, sem conversão automática.
           </p>
 
-          {!hasStructureError && (
+          {!isAdmin && (
+            <p className={styles.balanceNote}>
+              {ownEmployee
+                ? "Você pode consultar o caixa e registrar entradas somente em nome do seu personagem."
+                : "Acesso somente para consulta. Para registrar entradas, solicite à administração o vínculo da sua conta com um personagem."}
+            </p>
+          )}
+
+          {!hasStructureError && isAdmin && (
             <TreasuryLedger transactions={transactions} today={today} employees={employees} />
           )}
 
-          <Link className={styles.back} href="/adm">
-            ← Voltar ao painel ADM
+          <Link className={styles.back} href={isAdmin ? "/adm" : "/perfil"}>
+            {isAdmin ? "← Voltar ao painel ADM" : "← Voltar ao meu perfil"}
           </Link>
         </section>
       </main>

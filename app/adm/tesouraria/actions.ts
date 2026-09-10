@@ -54,20 +54,35 @@ function readTransaction(formData: FormData) {
 }
 
 export async function createTreasuryTransaction(formData: FormData) {
-  const current = await requireRole(["admin"]);
-  const input = readTransaction(formData);
-  if (!input) redirect("/adm/tesouraria?erro=dados");
-
+  const current = await requireRole(["admin", "funcionario"]);
+  const destination = current.role === "admin" ? "/adm/tesouraria" : "/tesouraria";
   const supabase = await createClient();
+  let counterpartyEmployeeId: string | null = null;
+  if (current.role !== "admin") {
+    if (!current.employee_id || formData.get("movement_type") !== "entrada") {
+      redirect(`${destination}?erro=permissao`);
+    }
+    const { data: employee, error } = await supabase.from("employees")
+      .select("id,name").eq("code", current.employee_id).maybeSingle();
+    if (error || !employee) redirect(`${destination}?erro=permissao`);
+    // Identity comes from the authenticated account, never from submitted names/IDs.
+    counterpartyEmployeeId = employee.id;
+    formData.set("counterparty", employee.name);
+  }
+  const input = readTransaction(formData);
+  if (!input) redirect(`${destination}?erro=dados`);
+
   const { error } = await supabase.from("treasury_transactions").insert({
     ...input,
+    ...(counterpartyEmployeeId ? { counterparty_employee_id: counterpartyEmployeeId } : {}),
     created_by: current.id,
     updated_by: current.id,
   });
 
-  if (error) redirect("/adm/tesouraria?erro=salvar");
+  if (error) redirect(`${destination}?erro=salvar`);
   revalidatePath("/adm/tesouraria");
-  redirect("/adm/tesouraria?criado=1");
+  revalidatePath("/tesouraria");
+  redirect(`${destination}?criado=1`);
 }
 
 export async function updateTreasuryTransaction(formData: FormData) {
@@ -84,6 +99,7 @@ export async function updateTreasuryTransaction(formData: FormData) {
 
   if (error) redirect("/adm/tesouraria?erro=salvar");
   revalidatePath("/adm/tesouraria");
+  revalidatePath("/tesouraria");
   redirect("/adm/tesouraria?salvo=1");
 }
 
@@ -97,5 +113,6 @@ export async function deleteTreasuryTransaction(formData: FormData) {
 
   if (error) redirect("/adm/tesouraria?erro=excluir");
   revalidatePath("/adm/tesouraria");
+  revalidatePath("/tesouraria");
   redirect("/adm/tesouraria?excluido=1");
 }

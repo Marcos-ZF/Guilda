@@ -32,10 +32,12 @@ export default function TreasuryModal({
   today,
   transaction,
   employees,
+  ownEmployee,
 }: {
   today: string;
   transaction?: TreasuryTransaction;
   employees: TreasuryEmployeeOption[];
+  ownEmployee?: TreasuryEmployeeOption;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const editing = Boolean(transaction);
@@ -86,7 +88,7 @@ export default function TreasuryModal({
         type="button"
         onClick={() => dialog.current?.showModal()}
       >
-        {editing ? "Editar" : "Nova movimentação"}
+        {editing ? "Editar" : ownEmployee ? "Registrar entrada" : "Nova movimentação"}
       </button>
 
       <dialog
@@ -100,7 +102,7 @@ export default function TreasuryModal({
           <div className={styles.modalHeader}>
             <div>
               <small>Tesouraria / Registro financeiro</small>
-              <h2>{editing ? "Editar movimentação" : "Nova movimentação"}</h2>
+              <h2>{editing ? "Editar movimentação" : ownEmployee ? "Registrar entrada" : "Nova movimentação"}</h2>
             </div>
             <button
               type="button"
@@ -125,7 +127,7 @@ export default function TreasuryModal({
                 required
               >
                 <option value="entrada">Entrada</option>
-                <option value="saida">Saída</option>
+                {!ownEmployee && <option value="saida">Saída</option>}
               </select>
             </label>
 
@@ -162,7 +164,7 @@ export default function TreasuryModal({
               </div>
             </fieldset>
 
-            <fieldset className={styles.peopleSelector}>
+            {!ownEmployee && <><fieldset className={styles.peopleSelector}>
               <legend>Funcionários cadastrados</legend>
               <p>Clique nos nomes para selecionar ou remover.</p>
               <div className={styles.employeeOptions}>
@@ -198,19 +200,21 @@ export default function TreasuryModal({
               <small className={styles.fieldHint}>
                 Use este campo quando a pessoa não estiver na lista de funcionários.
               </small>
-            </label>
+            </label></>}
 
             <label className={`${styles.wide} ${styles.counterpartyPreview}`}>
-              Quem pediu/deu o dinheiro
+              {ownEmployee ? "Personagem vinculado" : "Quem pediu/deu o dinheiro"}
               <input
                 name="counterparty"
-                value={counterparty}
+                value={ownEmployee?.name ?? counterparty}
                 readOnly
                 required
                 aria-describedby="counterparty-help"
               />
               <small className={styles.fieldHint} id="counterparty-help">
-                Esta é a lista completa que será salva no registro.
+                {ownEmployee
+                  ? "Esta entrada será vinculada somente ao seu personagem."
+                  : "Esta é a lista completa que será salva no registro."}
               </small>
             </label>
 

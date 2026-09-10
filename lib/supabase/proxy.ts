@@ -64,6 +64,7 @@ export async function updateSession(request: NextRequest) {
   const isProtectedRoute =
     path.startsWith("/relatorios") ||
     path.startsWith("/adm") ||
+    path.startsWith("/tesouraria") ||
     path.startsWith("/perfil");
   const hasVisitorAccess =
     request.cookies.get(VISITOR_ACCESS_COOKIE)?.value === getSaoPauloDateKey();

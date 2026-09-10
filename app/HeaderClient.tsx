@@ -138,6 +138,7 @@ export default function HeaderClient({ profile, photoUrl, isVisitor }: HeaderCli
           <Link href="/subsidiarias">Subsidiárias</Link>
           <Link href="/funcionarios">Funcionários</Link>
           {profile && <Link href="/relatorios">Relatórios</Link>}
+          {profile && !isAdmin && <Link href="/tesouraria">Tesouraria</Link>}
           {isAdmin && <Link href="/adm">ADM</Link>}
         </nav>
 
@@ -202,6 +203,7 @@ export default function HeaderClient({ profile, photoUrl, isVisitor }: HeaderCli
               <Link href="/funcionarios" onClick={() => setMobileOpen(false)}><span>05</span>Funcionários</Link>
               {profile && <Link href="/relatorios" onClick={() => setMobileOpen(false)}><span>06</span>Relatórios</Link>}
               {profile && <Link href="/perfil" onClick={() => setMobileOpen(false)}><span>07</span>Meu perfil</Link>}
+              {profile && !isAdmin && <Link href="/tesouraria" onClick={() => setMobileOpen(false)}><span>08</span>Tesouraria</Link>}
               {isAdmin && <Link href="/adm" onClick={() => setMobileOpen(false)}><span>08</span>Administração</Link>}
             </nav>
             <div className={styles.mobileAccount}>
