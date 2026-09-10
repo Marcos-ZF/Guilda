@@ -7,14 +7,6 @@ import styles from "./page.module.css";
 type TimelinePerson = { id: string; code: string; name: string };
 type TimelineView = { type: string; day: string; month: string; year: string; title: string; text: string; people: TimelinePerson[] };
 
-const fallbackTimeline: TimelineView[] = [
-  { type: "COMUNICADO", day: "21", month: "AGO", year: "2026", title: "Assembleia geral convocada", text: "Todos os funcionários devem apresentar-se no salão principal para a definição das próximas operações.", people: [] },
-  { type: "FEITO", day: "18", month: "AGO", year: "2026", title: "A passagem de Valebruma", text: "A rota entre os povoados do norte foi restaurada e declarada segura.", people: [] },
-  { type: "NOVO FUNCIONÁRIO", day: "14", month: "AGO", year: "2026", title: "Sienna Ember integra o arquivo", text: "A pesquisadora assume a função de Arquivista da Companhia Romanov.", people: [] },
-  { type: "RELATÓRIO", day: "02", month: "AGO", year: "2026", title: "Ruínas do Santuário", text: "Inventário preliminar dos artefatos recuperados durante a expedição.", people: [] },
-  { type: "FEITO", day: "24", month: "JUL", year: "2026", title: "O sino perdido de Eredan", text: "A relíquia foi recuperada e devolvida ao povo de Eredan.", people: [] },
-  { type: "COMUNICADO", day: "17", month: "JUL", year: "2026", title: "Treinamento em dois turnos", text: "O salão de treinamento passa a operar em dois turnos nos dias úteis.", people: [] },
-];
 
 type TimelineEntry = { id: string; entry_type: string; entry_date: string; title: string; description: string; involved: { employee: TimelinePerson | TimelinePerson[] | null }[] | null };
 type HomeMetrics = { employees?: number; reports?: number; service_time?: string };
@@ -30,20 +22,22 @@ function Crest() {
 }
 
 export default async function Home() {
-  let metrics: HomeMetrics = { employees: 0, reports: 0, service_time: "08" };
-  let timeline = fallbackTimeline;
+  let metrics: HomeMetrics = { employees: 0, reports: 0, service_time: "00" };
+  let timeline: TimelineView[] = [];
+  let timelineUnavailable = true;
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
     const supabase = await createClient();
-    const [{ data: metricData }, { data: timelineData }] = await Promise.all([
+    const [{ data: metricData }, { data: timelineData, error: timelineError }] = await Promise.all([
       supabase.rpc("home_metrics"),
       supabase.from("timeline_entries").select("id,entry_type,entry_date,title,description,involved:timeline_entry_employees(employee:employees(id,code,name))").order("entry_date", { ascending: false }).order("created_at", { ascending: false }).limit(40).returns<TimelineEntry[]>(),
     ]);
     if (metricData && typeof metricData === "object") metrics = metricData as HomeMetrics;
+    timelineUnavailable = Boolean(timelineError);
     if (timelineData?.length) timeline = timelineData.map(item => ({ type: item.entry_type.toUpperCase(), ...timelineDate(item.entry_date), title: item.title, text: item.description, people: (item.involved ?? []).flatMap(link => Array.isArray(link.employee) ? link.employee : link.employee ? [link.employee] : []) }));
   }
   const employeeCount = String(metrics.employees ?? 0).padStart(2, "0");
   const reportCount = String(metrics.reports ?? 0).padStart(2, "0");
-  const serviceTime = String(metrics.service_time || "08");
+  const serviceTime = String(metrics.service_time || "00");
   return (
     <div className={styles.page}>
       <Header />
@@ -93,6 +87,7 @@ export default async function Home() {
             <span className={styles.archiveCode}>RG-2026 / ATUALIZAÇÃO CONTÍNUA</span>
           </div>
           <div className={styles.timeline}>
+            {!timeline.length && <p>{timelineUnavailable ? "Não foi possível carregar a linha do tempo." : "Nenhum registro na linha do tempo."}</p>}
             {timeline.map((item) => (
               <details className={styles.timelineItem} key={`${item.title}-${item.day}-${item.month}-${item.year}`}>
                 <summary>

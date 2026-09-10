@@ -162,8 +162,8 @@ export default async function TreasuryPage({ searchParams }: Props) {
             <TreasuryLedger transactions={transactions} today={today} employees={isAdmin ? employees : []} canManage={isAdmin} />
           )}
 
-          <Link className={styles.back} href={isAdmin ? "/adm" : "/perfil"}>
-            {isAdmin ? "← Voltar ao painel ADM" : "← Voltar ao meu perfil"}
+          <Link className={styles.back} href="/adm">
+            ← Voltar ao painel ADM
           </Link>
         </section>
       </main>

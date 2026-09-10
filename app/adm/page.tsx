@@ -28,7 +28,7 @@ function backupHours(index: number) {
   const twoDayCycle = Math.floor(Date.now() / (48 * 60 * 60 * 1000));
   let seed = (twoDayCycle + 1) * 2654435761 + (index + 11) * 1013904223;
   seed = (seed ^ (seed >>> 16)) >>> 0;
-  return 48 + (seed % 49);
+  return 48 + (seed % 73);
 }
 
 const errors: Record<string, string> = {
@@ -41,13 +41,14 @@ const errors: Record<string, string> = {
 };
 
 export default async function AdminPage({ searchParams }: Props) {
-  const current = await requireRole(["admin"]);
+  const current = await requireRole(["admin", "funcionario"]);
+  const isAdmin = current.role === "admin";
   const params = await searchParams;
   const supabase = await createClient();
-  const [{ data }, { data: employeeData }] = await Promise.all([
+  const [{ data }, { data: employeeData }] = isAdmin ? await Promise.all([
     supabase.from("profiles").select("id,email,display_name,role,employee_id,created_at").order("created_at").order("id").returns<ManagedProfile[]>(),
     supabase.from("employees").select("code,name,is_active").order("name").returns<Employee[]>(),
-  ]);
+  ]) : [{ data: [] }, { data: [] }];
   const profiles = data ?? [];
   const employees = employeeData ?? [];
   const founderAdminId = profiles.find((profile) => profile.role === "admin")?.id;
@@ -63,20 +64,20 @@ export default async function AdminPage({ searchParams }: Props) {
           <p>Central de gestão do conteúdo, das pessoas e das permissões da companhia.</p>
         </section>
         <section className={styles.content}>
-          <p className={styles.adminNotice}>Acesso exclusivo para administradores da Companhia Romanov.</p>
+          <p className={styles.adminNotice}>{isAdmin ? "Acesso administrativo da Companhia Romanov." : "Acesso de funcionário: Tesouraria e Backups."}</p>
           <form className={styles.signout} action="/auth/signout" method="post"><button>Encerrar sessão</button></form>
 
           <div className={`${styles.toolbar} ${adminStyles.moduleHeader}`}><h2>Módulos administrativos</h2></div>
           <div className={`${styles.grid} ${adminStyles.modules}`}>
-            {tools.map((tool, index) => (
+            {tools.map((tool, index) => (!isAdmin && !tool.important ? null : (
               <article className={`${styles.card} ${tool.important ? adminStyles.treasuryModule : ""}`} key={tool.title}>
                 <p className={styles.cardLabel}>Módulo {String(index + 1).padStart(2, "0")}</p>
                 <h2>{tool.title}</h2><p>{tool.text}</p><Link className={tool.important ? adminStyles.treasuryLink : undefined} href={tool.href}>{tool.important ? "Acessar Tesouraria →" : "Gerenciar →"}</Link>
               </article>
-            ))}
+            )))}
           </div>
 
-          <section className={adminStyles.section} id="usuarios">
+          {isAdmin && <section className={adminStyles.section} id="usuarios">
             <div className={adminStyles.sectionHeader}>
               <div><h2>Usuários e cargos</h2><p>Gerencie o nome exibido, o nível de acesso e o vínculo com um funcionário.</p></div>
               <span className={adminStyles.count}>{profiles.length} contas</span>
@@ -114,7 +115,7 @@ export default async function AdminPage({ searchParams }: Props) {
               })}
               {!profiles.length && <p className={adminStyles.empty}>Nenhum perfil encontrado.</p>}
             </div>
-          </section>
+          </section>}
 
           <section className={adminStyles.backups} aria-labelledby="backups-title">
             <div className={adminStyles.backupHeading}>

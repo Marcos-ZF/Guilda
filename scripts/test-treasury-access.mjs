@@ -149,3 +149,51 @@ test("admin history retains edit and delete controls", () => {
   assert.match(html, /Editar/);
   assert.match(html, /Excluir/);
 });
+
+async function renderPanel(role) {
+  const panelSource = readFileSync(new URL("../app/adm/page.tsx", import.meta.url), "utf8");
+  const code = ts.transpileModule(panelSource, { compilerOptions: {
+    module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX,
+  } }).outputText;
+  const queries = [];
+  const exports = {};
+  vm.runInNewContext(code, { exports, require(name) {
+    if (name === "react/jsx-runtime") return jsxRuntime;
+    if (name.endsWith(".css")) return { default: {} };
+    if (name === "../Header") return { default: () => null };
+    if (name === "next/link") return { default: ({ children, ...props }) => React.createElement("a", props, children) };
+    if (name === "./actions") return { createAccount: "/test-create", updateProfile: "/test-update" };
+    if (name === "@/lib/auth") return { requireRole: async (roles) => {
+      assert.ok(roles.includes(role));
+      return { id: employee.id, role };
+    } };
+    if (name === "@/lib/supabase/server") return { createClient: async () => ({ from(table) {
+      queries.push(table);
+      const query = { select: () => query, order: () => query, returns: async () => ({ data: [] }) };
+      return query;
+    } }) };
+    throw new Error(`Unexpected dependency: ${name}`);
+  } });
+  return { html: renderToStaticMarkup(await exports.default({ searchParams: Promise.resolve({}) })), queries };
+}
+
+test("employee ADM panel contains only treasury and backups, without querying private accounts", async () => {
+  const { html, queries } = await renderPanel("funcionario");
+  assert.match(html, /Módulo 05/);
+  assert.match(html, /Tesouraria/);
+  assert.match(html, /Backups/);
+  assert.doesNotMatch(html, /Usuários e cargos|Criar acesso|Módulo 01|Módulo 02|Módulo 03|Módulo 04/);
+  assert.deepEqual(queries, []);
+  const hours = [...html.matchAll(/<strong>(\d+) horas<\/strong>/g)].map((match) => Number(match[1]));
+  assert.equal(hours.length, 3);
+  assert.ok(hours.every((value) => value >= 48 && value <= 120));
+});
+
+test("admin retains all modules and account management", async () => {
+  const { html, queries } = await renderPanel("admin");
+  assert.match(html, /Usuários e cargos/);
+  assert.match(html, /Criar acesso/);
+  assert.match(html, /Módulo 01/);
+  assert.match(html, /Módulo 05/);
+  assert.deepEqual(queries, ["profiles", "employees"]);
+});

@@ -19,12 +19,6 @@ type Employee = {
   employee_status: "active" | "inactive" | "deceased";
 };
 
-const fallbackEmployees: Employee[] = [
-  { id: "rr01", code: "RR01", initials: "RR", name: "Rodion Romanovich", role_title: "Comandante", position_title: "Guildmaster", honor_title: null, specialty: "Estratégia e liderança", photo_url: null, employee_status: "active" },
-  { id: "vm02", code: "VM02", initials: "VM", name: "Vera Morozova", role_title: "Vigia-Mor", position_title: null, honor_title: null, specialty: "Exploração e reconhecimento", photo_url: null, employee_status: "active" },
-  { id: "dm03", code: "DM03", initials: "DM", name: "Dimitri Markov", role_title: "Guardião", position_title: null, honor_title: null, specialty: "Defesa e linha de frente", photo_url: null, employee_status: "active" },
-  { id: "ak04", code: "AK04", initials: "AK", name: "Anya Kuznetsova", role_title: "Arquivista", position_title: null, honor_title: null, specialty: "Pesquisa e documentação", photo_url: null, employee_status: "active" },
-];
 
 type Props = { searchParams: Promise<{ busca?: string }> };
 
@@ -52,21 +46,23 @@ function EmployeeCard({ employee, index, memorial = false, inactive = false }: {
 export default async function EmployeesPage({ searchParams }: Props) {
   await connection();
   const params = await searchParams;
-  let employees = fallbackEmployees;
+  let employees: Employee[] = [];
+  let unavailable = true;
 
   if (
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   ) {
     const supabase = await createClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("employees")
       .select("id, code, initials, name, role_title, position_title, honor_title, specialty, photo_url, employee_status")
       .order("sort_order", { ascending: true })
       .order("name", { ascending: true })
       .returns<Employee[]>();
 
-    if (data?.length) employees = data;
+    unavailable = Boolean(error);
+    employees = data ?? [];
   }
 
   const search = normalizeSearch(params.busca?.trim() ?? "");
@@ -91,7 +87,7 @@ export default async function EmployeesPage({ searchParams }: Props) {
           <LiveNameSearch path="/funcionarios" initialValue={params.busca} label="Pesquisar funcionário por nome" />
           <div className={employeeStyles.roster}>
             {normalEmployees.map((employee, index) => <EmployeeCard employee={employee} index={index} inactive={employee.employee_status === "inactive"} key={employee.id} />)}
-            {!normalEmployees.length && <p className={employeeStyles.empty}>Nenhum funcionário encontrado.</p>}
+            {!normalEmployees.length && <p className={employeeStyles.empty}>{unavailable ? "Não foi possível carregar os funcionários." : "Nenhum funcionário encontrado."}</p>}
           </div>
           <Link className={styles.back} href="/">← Voltar para a Home</Link>
           {deceasedEmployees.length > 0 && (
