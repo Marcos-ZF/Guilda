@@ -5,6 +5,9 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import vm from "node:vm";
 import ts from "typescript";
+import * as React from "react";
+import * as jsxRuntime from "react/jsx-runtime";
+import { renderToStaticMarkup } from "react-dom/server";
 
 const source = readFileSync(new URL("../app/adm/tesouraria/actions.ts", import.meta.url), "utf8");
 const compiled = ts.transpileModule(source, {
@@ -104,4 +107,45 @@ test("database rejection is never reported as successful", async () => {
   const h = harness("funcionario", true, { code: "42501" });
   await assert.rejects(h.actions.createTreasuryTransaction(form()), /erro=salvar/);
   assert.equal(h.invalidations.length, 0);
+});
+
+function renderLedger(canManage) {
+  const ledgerSource = readFileSync(new URL("../app/adm/tesouraria/TreasuryLedger.tsx", import.meta.url), "utf8");
+  const ledgerCode = ts.transpileModule(ledgerSource, { compilerOptions: {
+    module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX,
+  } }).outputText;
+  const exports = {};
+  vm.runInNewContext(ledgerCode, { exports, require(name) {
+    if (name === "react") return React;
+    if (name === "react/jsx-runtime") return jsxRuntime;
+    if (name === "./treasury.module.css") return { default: {} };
+    if (name === "./actions") return { deleteTreasuryTransaction: "/test-delete" };
+    if (name === "./TreasuryModal") return { default: () => React.createElement("button", null, "Editar") };
+    if (name === "@/app/components/ConfirmSubmitButton") return { default: ({ children }) => React.createElement("button", null, children) };
+    throw new Error(`Unexpected dependency: ${name}`);
+  } });
+  return renderToStaticMarkup(React.createElement(exports.default, {
+    canManage, today: "2026-09-10", employees: [], transactions: [{
+      id: employee.id, movement_type: "entrada", transaction_date: "2026-09-10",
+      bronze: 5, prata: 0, ouro: 0, platina: 0, counterparty: "Personagem próprio",
+      description: "Doação", created_at: "2026-09-10T12:00:00Z", creator: null,
+    }],
+  }));
+}
+
+test("employee history shows records and filters without mutation controls", () => {
+  for (const canManage of [false, undefined]) {
+    const html = renderLedger(canManage);
+    assert.match(html, /Histórico de movimentações/);
+    assert.match(html, /Pesquisar quem pediu/);
+    assert.match(html, /Personagem próprio/);
+    assert.match(html, /Doação/);
+    assert.doesNotMatch(html, /Editar|Excluir|<form/);
+  }
+});
+
+test("admin history retains edit and delete controls", () => {
+  const html = renderLedger(true);
+  assert.match(html, /Editar/);
+  assert.match(html, /Excluir/);
 });

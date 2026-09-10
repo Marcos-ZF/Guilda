@@ -53,15 +53,17 @@ export default async function TreasuryPage({ searchParams }: Props) {
     { data: employeeData, error: employeeError },
   ] =
     await Promise.all([
-      isAdmin ? supabase
+      supabase
         .from("treasury_transactions")
         .select(
-          "id,movement_type,transaction_date,bronze,prata,ouro,platina,counterparty,description,created_at,creator:profiles!treasury_transactions_created_by_fkey(display_name,email)",
+          isAdmin
+            ? "id,movement_type,transaction_date,bronze,prata,ouro,platina,counterparty,description,created_at,creator:profiles!treasury_transactions_created_by_fkey(display_name,email)"
+            : "id,movement_type,transaction_date,bronze,prata,ouro,platina,counterparty,description,created_at,creator:profiles!treasury_transactions_created_by_fkey(display_name)",
         )
         .order("transaction_date", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(500)
-        .returns<TransactionRow[]>() : Promise.resolve({ data: [], error: null }),
+        .returns<TransactionRow[]>(),
       supabase.rpc("treasury_balances").maybeSingle<TreasuryBalances>(),
       isAdmin ? supabase
         .from("employees")
@@ -151,13 +153,13 @@ export default async function TreasuryPage({ searchParams }: Props) {
           {!isAdmin && (
             <p className={styles.balanceNote}>
               {ownEmployee
-                ? "Você pode consultar o caixa e registrar entradas somente em nome do seu personagem."
-                : "Acesso somente para consulta. Para registrar entradas, solicite à administração o vínculo da sua conta com um personagem."}
+                ? "Você pode consultar o caixa e o histórico e registrar entradas somente em nome do seu personagem."
+                : "Caixa e histórico disponíveis somente para consulta. Para registrar entradas, solicite à administração o vínculo da sua conta com um personagem."}
             </p>
           )}
 
-          {!hasStructureError && isAdmin && (
-            <TreasuryLedger transactions={transactions} today={today} employees={employees} />
+          {!hasStructureError && (
+            <TreasuryLedger transactions={transactions} today={today} employees={isAdmin ? employees : []} canManage={isAdmin} />
           )}
 
           <Link className={styles.back} href={isAdmin ? "/adm" : "/perfil"}>

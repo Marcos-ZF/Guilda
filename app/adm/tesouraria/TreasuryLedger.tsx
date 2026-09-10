@@ -33,10 +33,12 @@ export default function TreasuryLedger({
   transactions,
   today,
   employees,
+  canManage = false,
 }: {
   transactions: TreasuryTransaction[];
   today: string;
   employees: TreasuryEmployeeOption[];
+  canManage?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [type, setType] = useState("todos");
@@ -127,14 +129,14 @@ export default function TreasuryLedger({
               <dl>
                 <div>
                   <dt>Registrado por</dt>
-                  <dd>{transaction.creator?.display_name || transaction.creator?.email || "Administrador"}</dd>
+                  <dd>{transaction.creator?.display_name || transaction.creator?.email || "Usuário da companhia"}</dd>
                 </div>
                 <div>
                   <dt>Registro criado em</dt>
                   <dd>{new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(transaction.created_at))}</dd>
                 </div>
               </dl>
-              <div className={styles.transactionActions}>
+              {canManage && <div className={styles.transactionActions}>
                 <TreasuryModal transaction={transaction} today={today} employees={employees} />
                 <form action={deleteTreasuryTransaction}>
                   <input type="hidden" name="id" value={transaction.id} />
@@ -145,7 +147,7 @@ export default function TreasuryLedger({
                     Excluir
                   </ConfirmSubmitButton>
                 </form>
-              </div>
+              </div>}
             </div>
           </details>
         ))}
