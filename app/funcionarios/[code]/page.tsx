@@ -273,9 +273,9 @@ export default async function EmployeeProfilePage({ params, searchParams }: Prop
                     <label>Idade</label><input name="age" type="number" min="0" max="9999" defaultValue={employee.age ?? ""} />
                     <label>Sexo</label><select name="sex" defaultValue={employee.sex ?? ""}><option value="">Não informado</option><option value="Feminino">Feminino</option><option value="Masculino">Masculino</option></select>
                     <label>Doc — link do Google Docs (opcional)</label><input name="document_url" type="url" defaultValue={employee.document_url ?? ""} placeholder="https://docs.google.com/..." />
-                    <label>Cargo</label><input name="position_title" defaultValue={employee.position_title ?? ""} />
+                    <label>Cargo</label><input name={isAdmin ? "position_title" : undefined} defaultValue={employee.position_title ?? ""} readOnly={!isAdmin} />
                     <label>Cargo de Honra</label>
-                    <select name="honor_title" defaultValue={employee.honor_title ?? ""}>
+                    <select name={isAdmin ? "honor_title" : undefined} defaultValue={employee.honor_title ?? ""} disabled={!isAdmin}>
                       <option value="">Sem cargo de honra</option>
                       {["Katyusha", "Ilya", "Dobrynya", "Alyosha", "Rasputin", "Baba Yaga", "Vasilisa"].map((title) => <option key={title}>{title}</option>)}
                     </select>

@@ -15,7 +15,7 @@ async function requireManager(employeeId: string) {
   const supabase = await createClient();
   const { data: employee } = await supabase.from("employees").select("id, code").eq("id", employeeId).single<{ id: string; code: string }>();
   if (!employee || (profile.role !== "admin" && profile.employee_id !== employee.code)) redirect("/?erro=sem-permissao");
-  return { employee, supabase };
+  return { employee, supabase, profile };
 }
 async function uploadImage(employeeId: string, file: File, folder: string) {
   if (!file.size) return null;
@@ -101,12 +101,12 @@ export async function updateEmployeeProfile(formData: FormData) {
   const positionTitle = String(formData.get("position_title") ?? "").trim(), honorTitle = String(formData.get("honor_title") ?? "").trim();
   const ageText = String(formData.get("age") ?? "").trim(), documentUrl = String(formData.get("document_url") ?? "").trim();
   const age = ageText ? Number(ageText) : null;
-  const photo = formData.get("photo"), { supabase } = await requireManager(employeeId);
-  if (!name || !roleTitle || !specialty || name.length > 80 || roleTitle.length > 80 || positionTitle.length > 80 || !honorTitles.has(honorTitle) || specialty.length > 160 || about.length > 3000 || height.length > 30 || race.length > 80 || !sexes.has(sex) || (age !== null && (!Number.isInteger(age) || age < 0 || age > 9999)) || (documentUrl && !/^https?:\/\//i.test(documentUrl))) redirect(`/funcionarios/${code}?erro=dados#editar`);
+  const photo = formData.get("photo"), { supabase, profile } = await requireManager(employeeId);
+  if (!name || !roleTitle || !specialty || name.length > 80 || roleTitle.length > 80 || (profile.role === "admin" && (positionTitle.length > 80 || !honorTitles.has(honorTitle))) || specialty.length > 160 || about.length > 3000 || height.length > 30 || race.length > 80 || !sexes.has(sex) || (age !== null && (!Number.isInteger(age) || age < 0 || age > 9999)) || (documentUrl && !/^https?:\/\//i.test(documentUrl))) redirect(`/funcionarios/${code}?erro=dados#editar`);
   let photoUrl: string | undefined;
   try { if (photo instanceof File && photo.size) photoUrl = (await uploadImage(employeeId, photo, "profile")) ?? undefined; }
   catch { redirect(`/funcionarios/${code}?erro=imagem#editar`); }
-  const { error } = await supabase.from("employees").update({ name, role_title: roleTitle, position_title:positionTitle||null, honor_title:honorTitle||null, specialty, about, height:height||null, race:race||null, age, sex:sex||null, document_url:documentUrl||null, ...(photoUrl ? { photo_url: photoUrl } : {}), updated_at: new Date().toISOString() }).eq("id", employeeId);
+  const { error } = await supabase.from("employees").update({ name, role_title: roleTitle, ...(profile.role === "admin" ? { position_title: positionTitle || null, honor_title: honorTitle || null } : {}), specialty, about, height:height||null, race:race||null, age, sex:sex||null, document_url:documentUrl||null, ...(photoUrl ? { photo_url: photoUrl } : {}), updated_at: new Date().toISOString() }).eq("id", employeeId);
   if (error) redirect(`/funcionarios/${code}?erro=salvar#editar`);
   revalidatePath(`/funcionarios/${code}`); revalidatePath("/funcionarios"); redirect(`/funcionarios/${code}?salvo=1`);
 }
