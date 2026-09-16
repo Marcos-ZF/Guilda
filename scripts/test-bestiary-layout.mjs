@@ -49,6 +49,16 @@ try {
     assert.ok(values.remove < values.add);
     await page.evaluate(() => document.querySelector('dialog').showModal());
     assert.equal(await page.locator('dialog').isVisible(), true);
+    const guide = await page.evaluate(() => {
+      const dialog = document.querySelector('dialog');
+      const title = document.querySelector('.categoryGuide h4');
+      const description = document.querySelector('.categoryGuide p');
+      return { count: document.querySelectorAll('.categoryGuide li').length, titleSize: parseFloat(getComputedStyle(title).fontSize), descriptionSize: parseFloat(getComputedStyle(description).fontSize), overflow: dialog.scrollWidth > dialog.clientWidth + 1 };
+    });
+    assert.equal(guide.count, 6);
+    assert.ok(guide.titleSize > guide.descriptionSize);
+    assert.equal(guide.overflow, false, `manual overflow at ${width}`);
+    if (process.env.MANUAL_SCREENSHOT && [1440,390].includes(width)) await page.screenshot({ path: `${process.env.MANUAL_SCREENSHOT}-${width}.png` });
     await page.keyboard.press('Escape');
     assert.equal(await page.locator('dialog').isVisible(), false);
     console.log(`PASS ${width}px: ${columns} columns, aligned controls, no overflow, compact removal, modal Escape`);

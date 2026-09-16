@@ -39,6 +39,10 @@
 .manual header button{flex-shrink:0;width:40px;height:40px;background:var(--wine);color:white;border:1px solid var(--red);font-size:24px;cursor:pointer}
 .manual h3{font-family:var(--font-display);font-size:25px;margin:24px 0 12px}
 .manual p{font-size:16px;line-height:1.6;white-space:normal}
+.categoryGuide{list-style:none;padding:0;margin:12px 0 26px}
+.categoryGuide li{padding:14px 0;border-bottom:1px solid #625d58}
+.categoryGuide h4{font-family:var(--font-display);font-size:22px;line-height:1.2;margin-bottom:7px}
+.manual .categoryGuide p{font-size:14px;line-height:1.5;color:#ddd7ce;overflow-wrap:anywhere}
 .difficultyList,.damageLegend{list-style:none;padding:0;margin:20px 0}
 .difficultyList li{padding:14px 0;border-bottom:1px solid #625d58}
 .difficultyList li>div{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:6px}

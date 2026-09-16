@@ -160,6 +160,16 @@ test('manual renders eight difficulty levels and all four damage meanings', () =
   const manual = compile('../app/bestiario/BestiaryManual.tsx', { ...dependencies, './DamageDot': dot, './ThreatStars': stars });
   const html = renderToStaticMarkup(React.createElement(manual.default));
   assert.match(html, /<dialog/);
+  let categoryIndex = -1;
+  for (const category of model.categories) {
+    const index = html.indexOf(`<h4>${category}</h4>`);
+    assert.ok(index > categoryIndex, `manual category order: ${category}`);
+    categoryIndex = index;
+  }
+  assert.ok(categoryIndex < html.indexOf('<h3>Nível de ameaça</h3>'));
+  for (const phrase of ['pensamento complexo', 'hierarquias de dominância', 'pontos vitais convencionais', 'territórios sagrados', 'corromper o ambiente', 'criadores já desapareceram']) assert.ok(html.includes(phrase));
+  assert.equal((html.match(/sem muitas complicações/g) || []).length, 7);
+  assert.ok(!html.includes('derrota facilmente'));
   for (const level of model.threatLevels) assert.ok(html.includes(`${level} de 8 estrelas`));
   for (const option of model.damageOptions) assert.ok(html.includes(option.label));
   assert.match(html, /Chefes para um grupo de Divisão 1/);
