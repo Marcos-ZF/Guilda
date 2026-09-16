@@ -8,6 +8,7 @@ import TreasuryModal, {
   type TreasuryTransaction,
 } from "./TreasuryModal";
 import styles from "./treasury.module.css";
+import layout from "../../internal.module.css";
 
 export const dynamic = "force-dynamic";
 
@@ -95,12 +96,10 @@ export default async function TreasuryPage({ searchParams }: Props) {
     <div className={styles.page}>
       <Header />
       <main>
-        <section className={styles.hero}>
-          <div>
-            <p>CONTROLE CENTRAL / MÓDULO 05</p>
+        <section className={layout.hero}>
+            <p className={layout.eyebrow}>CONTROLE CENTRAL / MÓDULO 05</p>
             <h1>Tesouraria</h1>
-            <span>Registro oficial dos recursos financeiros da Companhia Romanov.</span>
-          </div>
+            <p>Registro oficial dos recursos financeiros da Companhia Romanov.</p>
         </section>
 
         <section className={styles.content}>

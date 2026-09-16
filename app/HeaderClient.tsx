@@ -108,6 +108,8 @@ export default function HeaderClient({ profile, photoUrl, isVisitor }: HeaderCli
 
   const compact = scrolled && !expanded;
   const isAdmin = profile?.role === "admin";
+  const isStaff = isAdmin || profile?.role === "funcionario";
+  const roleLabel = isAdmin ? "Administrador" : profile?.role === "aliado" ? "Aliado" : "Funcionário";
   const accountHref = "/perfil";
 
   return (
@@ -138,7 +140,7 @@ export default function HeaderClient({ profile, photoUrl, isVisitor }: HeaderCli
           <Link href="/funcionarios">Funcionários</Link>
           {profile && <Link href="/relatorios">Relatórios</Link>}
           {profile && <Link href="/bestiario">Bestiário</Link>}
-          {profile && <Link href="/adm">ADM</Link>}
+          {isStaff && <Link href="/adm">ADM</Link>}
         </nav>
 
         <div className={styles.headerActions}>
@@ -146,11 +148,11 @@ export default function HeaderClient({ profile, photoUrl, isVisitor }: HeaderCli
             <>
               <span className={styles.accountText}>
                 <strong>{profile.display_name || profile.email}</strong>
-                <small>{isAdmin ? "Administrador" : "Funcionário"}</small>
+                <small>{roleLabel}</small>
               </span>
-              <Link className={styles.profileButton} style={photoUrl ? { backgroundImage: `url("${photoUrl}")` } : undefined} href={accountHref} aria-label="Abrir meu perfil" title="Meu perfil">
+              {isStaff && <Link className={styles.profileButton} style={photoUrl ? { backgroundImage: `url("${photoUrl}")` } : undefined} href={accountHref} aria-label="Abrir meu perfil" title="Meu perfil">
                 {!photoUrl && <span>{getInitials(profile)}</span>}
-              </Link>
+              </Link>}
               <form className={styles.signoutForm} action="/auth/signout" method="post">
                 <button type="submit">Sair</button>
               </form>
@@ -201,8 +203,8 @@ export default function HeaderClient({ profile, photoUrl, isVisitor }: HeaderCli
               <Link href="/funcionarios" onClick={() => setMobileOpen(false)}><span>04</span>Funcionários</Link>
               {profile && <Link href="/relatorios" onClick={() => setMobileOpen(false)}><span>05</span>Relatórios</Link>}
               {profile && <Link href="/bestiario" onClick={() => setMobileOpen(false)}><span>06</span>Bestiário</Link>}
-              {profile && <Link href="/perfil" onClick={() => setMobileOpen(false)}><span>07</span>Meu perfil</Link>}
-              {profile && <Link href="/adm" onClick={() => setMobileOpen(false)}><span>08</span>ADM</Link>}
+              {isStaff && <Link href="/perfil" onClick={() => setMobileOpen(false)}><span>07</span>Meu perfil</Link>}
+              {isStaff && <Link href="/adm" onClick={() => setMobileOpen(false)}><span>08</span>ADM</Link>}
             </nav>
             <div className={styles.mobileAccount}>
               {profile ? (
@@ -211,7 +213,7 @@ export default function HeaderClient({ profile, photoUrl, isVisitor }: HeaderCli
                     <span className={styles.mobileAvatar} style={photoUrl ? { backgroundImage: `url("${photoUrl}")` } : undefined}>
                       {!photoUrl && getInitials(profile)}
                     </span>
-                    <p><strong>{profile.display_name || profile.email}</strong><small>{isAdmin ? "Administrador" : "Funcionário"}</small></p>
+                    <p><strong>{profile.display_name || profile.email}</strong><small>{roleLabel}</small></p>
                   </div>
                   <form action="/auth/signout" method="post"><button type="submit">Encerrar sessão</button></form>
                 </>

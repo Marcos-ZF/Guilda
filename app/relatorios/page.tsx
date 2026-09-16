@@ -18,7 +18,7 @@ function normalizeSearch(value: string) {
 }
 
 export default async function ReportsPage({ searchParams }: Props) {
-  const profile = await requireRole(["funcionario", "admin"]);
+  const profile = await requireRole(["aliado", "funcionario", "admin"]);
   const params = await searchParams;
   const supabase = await createClient();
   const [{ data: reportData, error }, { data: employeeData }] = await Promise.all([
@@ -44,7 +44,7 @@ export default async function ReportsPage({ searchParams }: Props) {
           <p>Índice dos documentos oficiais da companhia. O conteúdo completo permanece organizado no Google Docs.</p>
         </section>
         <section className={styles.content}>
-          <p className={styles.adminNotice}>Acesso permitido para funcionários e administradores autenticados.</p>
+          <p className={styles.adminNotice}>Consulta permitida para aliados, funcionários e administradores autenticados.</p>
           {(params.criado || params.excluido) && <p className={reportStyles.success}>{params.excluido ? "Relatório excluído." : "Relatório criado."}</p>}
           {(params.erro || error) && <p className={reportStyles.error}>Não foi possível carregar ou salvar. Execute primeiro o SQL de relatórios no Supabase.</p>}
           <div className={styles.toolbar}>

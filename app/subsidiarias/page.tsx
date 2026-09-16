@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import LiveNameSearch from "../components/LiveNameSearch";
 import SubsidiaryCreateModal from "./SubsidiaryCreateModal";
 import styles from "./subsidiarias.module.css";
+import layout from "../internal.module.css";
 
 type Subsidiary = {
   id: string;
@@ -48,10 +49,10 @@ export default async function SubsidiariesPage({ searchParams }: Props) {
     <div className={styles.page}>
       <Header />
       <main>
-        <section className={styles.hero}>
-          <p>ESTRUTURA / COMPANHIA / 06</p>
+        <section className={layout.hero}>
+          <p className={layout.eyebrow}>ESTRUTURA / COMPANHIA / 06</p>
           <h1>Subsidiárias</h1>
-          <span>Setores especializados vinculados à Companhia de Sideria.</span>
+          <p>Setores especializados vinculados à Companhia de Sideria.</p>
         </section>
         <section className={styles.content}>
           {query.excluido && <p className={styles.message}>Subsidiária excluída.</p>}

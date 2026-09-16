@@ -12,7 +12,7 @@ import DamageDot from "../DamageDot";
 import styles from "../bestiario.module.css";
 
 export default async function CreaturePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ salvo?: string }> }) {
-  const profile = await requireRole(["funcionario", "admin"]);
+  const profile = await requireRole(["aliado", "funcionario", "admin"]);
   const { id } = await params, query = await searchParams;
   if (!uuidPattern.test(id)) notFound();
   const supabase = await createClient();

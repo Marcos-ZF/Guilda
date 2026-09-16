@@ -108,7 +108,7 @@ export default async function EmployeeProfilePage({ params, searchParams }: Prop
 
   const equipment = (equipmentData ?? []) as Equipment[];
   const achievements = (achievementData ?? []) as Achievement[];
-  const canEdit = profile?.role === "admin" || profile?.employee_id === employee.code;
+  const canEdit = profile?.role === "admin" || (profile?.role === "funcionario" && profile.employee_id === employee.code);
   const isAdmin = profile?.role === "admin";
   const employeeStatus = employee.employee_status ?? (employee.is_active ? "active" : "inactive");
   const Hidden = () => (

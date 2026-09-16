@@ -3,7 +3,7 @@ import { connection } from "next/server";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
-export type UserRole = "funcionario" | "admin";
+export type UserRole = "aliado" | "funcionario" | "admin";
 
 export type CurrentProfile = {
   id: string;
@@ -40,7 +40,7 @@ export const getCurrentProfile = cache(async (): Promise<CurrentProfile | null> 
   if (
     profileError ||
     !profile ||
-    !["funcionario", "admin"].includes(profile.role)
+    !["aliado", "funcionario", "admin"].includes(profile.role)
   ) {
     return null;
   }

@@ -35,9 +35,9 @@ export async function login(formData: FormData) {
     .from("profiles")
     .select("role")
     .eq("id", data.user.id)
-    .single<{ role: "funcionario" | "admin" }>();
+    .single<{ role: "aliado" | "funcionario" | "admin" }>();
 
-  if (!profile) {
+  if (!profile || !["aliado", "funcionario", "admin"].includes(profile.role)) {
     await supabase.auth.signOut();
     redirect("/login?erro=perfil");
   }

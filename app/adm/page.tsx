@@ -91,7 +91,7 @@ export default async function AdminPage({ searchParams }: Props) {
               <div className={adminStyles.field}><label>E-mail</label><input name="email" type="email" required /></div>
               <div className={adminStyles.field}><label>Senha inicial</label><input name="password" type="password" minLength={8} required /></div>
               <div className={adminStyles.field}><label>Funcionário vinculado</label><select name="employee_id" defaultValue=""><option value="">Nenhum funcionário</option>{employees.map((employee) => <option value={employee.code} key={employee.code}>{employee.name} · {employee.code}{employee.is_active ? "" : " (inativo)"}</option>)}</select></div>
-              <div className={adminStyles.field}><label>Permissão</label><select name="role" defaultValue="funcionario"><option value="funcionario">Funcionário</option><option value="admin">Administrador</option></select></div>
+              <div className={adminStyles.field}><label>Permissão</label><select name="role" defaultValue="funcionario"><option value="aliado">Aliado (somente leitura)</option><option value="funcionario">Funcionário</option><option value="admin">Administrador</option></select></div>
               <button className={adminStyles.save}>Criar conta</button>
             </form>
 
@@ -108,7 +108,7 @@ export default async function AdminPage({ searchParams }: Props) {
                     <div className={adminStyles.field}><label>E-mail</label><input name="email" type="email" defaultValue={profile.email ?? ""} required /></div>
                     <div className={adminStyles.field}><label>Nova senha</label><input name="password" type="password" minLength={8} placeholder="Manter senha atual" /></div>
                     <div className={adminStyles.field}><label>Funcionário vinculado</label><select name="employee_id" defaultValue={profile.employee_id ?? ""}><option value="">Nenhum funcionário</option>{employees.map((employee) => <option value={employee.code} key={employee.code}>{employee.name} · {employee.code}</option>)}</select></div>
-                    <div className={adminStyles.field}><label>Cargo de acesso</label>{roleLocked && <input type="hidden" name="role" value="admin" />}<select name={roleLocked ? undefined : "role"} defaultValue={profile.role} disabled={roleLocked}><option value="funcionario">Funcionário</option><option value="admin">Administrador</option></select>{founder && <small className={adminStyles.fieldHint}>Protegido contra rebaixamento</small>}</div>
+                    <div className={adminStyles.field}><label>Cargo de acesso</label>{roleLocked && <input type="hidden" name="role" value="admin" />}<select name={roleLocked ? undefined : "role"} defaultValue={profile.role} disabled={roleLocked}><option value="aliado">Aliado (somente leitura)</option><option value="funcionario">Funcionário</option><option value="admin">Administrador</option></select>{founder && <small className={adminStyles.fieldHint}>Protegido contra rebaixamento</small>}</div>
                     <button className={adminStyles.save}>Salvar perfil</button>
                   </form>
                 );

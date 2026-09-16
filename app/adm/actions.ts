@@ -6,7 +6,7 @@ import { requireRole, type UserRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-const validRoles: UserRole[] = ["funcionario", "admin"];
+const validRoles: UserRole[] = ["aliado", "funcionario", "admin"];
 
 async function employeeExists(code:string){if(!code)return true;const supabase=await createClient();const {data}=await supabase.from("employees").select("id").eq("code",code).maybeSingle();return Boolean(data)}
 
