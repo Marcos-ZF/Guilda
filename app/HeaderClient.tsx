@@ -134,10 +134,10 @@ export default function HeaderClient({ profile, photoUrl, isVisitor }: HeaderCli
 
         <nav className={styles.nav} aria-label="Navegação principal">
           <Link href="/#inicio">A Companhia</Link>
-          <Link href="/#linha-do-tempo">Linha do tempo</Link>
           <Link href="/subsidiarias">Subsidiárias</Link>
           <Link href="/funcionarios">Funcionários</Link>
           {profile && <Link href="/relatorios">Relatórios</Link>}
+          {profile && <Link href="/bestiario">Bestiário</Link>}
           {profile && <Link href="/adm">ADM</Link>}
         </nav>
 
@@ -197,10 +197,10 @@ export default function HeaderClient({ profile, photoUrl, isVisitor }: HeaderCli
             <nav className={styles.mobileNav} aria-label="Navegação móvel">
               <Link href="/#inicio" onClick={() => setMobileOpen(false)}><span>01</span>Início</Link>
               <Link href="/#inicio" onClick={() => setMobileOpen(false)}><span>02</span>A Companhia</Link>
-              <Link href="/#linha-do-tempo" onClick={() => setMobileOpen(false)}><span>03</span>Linha do tempo</Link>
-              <Link href="/subsidiarias" onClick={() => setMobileOpen(false)}><span>04</span>Subsidiárias</Link>
-              <Link href="/funcionarios" onClick={() => setMobileOpen(false)}><span>05</span>Funcionários</Link>
-              {profile && <Link href="/relatorios" onClick={() => setMobileOpen(false)}><span>06</span>Relatórios</Link>}
+              <Link href="/subsidiarias" onClick={() => setMobileOpen(false)}><span>03</span>Subsidiárias</Link>
+              <Link href="/funcionarios" onClick={() => setMobileOpen(false)}><span>04</span>Funcionários</Link>
+              {profile && <Link href="/relatorios" onClick={() => setMobileOpen(false)}><span>05</span>Relatórios</Link>}
+              {profile && <Link href="/bestiario" onClick={() => setMobileOpen(false)}><span>06</span>Bestiário</Link>}
               {profile && <Link href="/perfil" onClick={() => setMobileOpen(false)}><span>07</span>Meu perfil</Link>}
               {profile && <Link href="/adm" onClick={() => setMobileOpen(false)}><span>08</span>ADM</Link>}
             </nav>
