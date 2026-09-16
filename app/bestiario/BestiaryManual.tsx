@@ -6,13 +6,13 @@ import ThreatStars from "./ThreatStars";
 import styles from "./bestiario.module.css";
 
 const difficulty = [
-  "Criaturas fracas em geral, que um grupo de Divisão 7 derrota facilmente.",
-  "Chefes para um grupo de Divisão 7; um grupo de Divisão 6 derrota facilmente.",
-  "Chefes para um grupo de Divisão 6; um grupo de Divisão 5 derrota facilmente.",
-  "Chefes para um grupo de Divisão 5; um grupo de Divisão 4 derrota facilmente.",
-  "Chefes para um grupo de Divisão 4; um grupo de Divisão 3 derrota facilmente.",
-  "Chefes para um grupo de Divisão 3; um grupo de Divisão 2 derrota facilmente.",
-  "Chefes para um grupo de Divisão 2; um grupo de Divisão 1 derrota facilmente.",
+  "Criaturas fracas em geral, que um grupo de Divisão 7 derrota sem muitas complicações.",
+  "Chefes para um grupo de Divisão 7; um grupo de Divisão 6 derrota sem muitas complicações.",
+  "Chefes para um grupo de Divisão 6; um grupo de Divisão 5 derrota sem muitas complicações.",
+  "Chefes para um grupo de Divisão 5; um grupo de Divisão 4 derrota sem muitas complicações.",
+  "Chefes para um grupo de Divisão 4; um grupo de Divisão 3 derrota sem muitas complicações.",
+  "Chefes para um grupo de Divisão 3; um grupo de Divisão 2 derrota sem muitas complicações.",
+  "Chefes para um grupo de Divisão 2; um grupo de Divisão 1 derrota sem muitas complicações.",
   "Chefes para um grupo de Divisão 1.",
 ];
 
