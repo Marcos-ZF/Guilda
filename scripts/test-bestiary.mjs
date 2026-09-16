@@ -29,12 +29,12 @@ function form(extra = {}) {
   return data;
 }
 
-test('all six categories and five threat levels are valid', () => {
+test('all six categories and eight threat levels are valid', () => {
   assert.equal(model.categories.length, 6);
-  for (const category of model.categories) for (const threat of [1,2,3,4,5]) assert.ok(model.parseCreature(form({ category, threat: String(threat) })));
+  for (const category of model.categories) for (const threat of [1,2,3,4,5,6,7,8]) assert.ok(model.parseCreature(form({ category, threat: String(threat) })));
 });
 test('invalid threat, category, responsible ID and oversized fields are rejected', () => {
-  for (const extra of [{ threat: '0' }, { threat: '6' }, { threat: '2.5' }, { threat: 'abc' }, { category: 'Outro' }, { discoverer_employee_id: 'bad' }, { name: 'x' }, { strategies: 'a'.repeat(10001) }]) assert.equal(model.parseCreature(form(extra)), null);
+  for (const extra of [{ threat: '0' }, { threat: '9' }, { threat: '2.5' }, { threat: 'abc' }, { category: 'Outro' }, { discoverer_employee_id: 'bad' }, { name: 'x' }, { strategies: 'a'.repeat(10001) }]) assert.equal(model.parseCreature(form(extra)), null);
 });
 test('abilities stay separate and empty optional fields are accepted', () => {
   const data = form();
@@ -128,6 +128,41 @@ test('directory renders all categories, cards, two filters and accessible stars'
   });
   const html = renderToStaticMarkup(React.createElement(directory.default, { creatures: [{ id: creatureId, name: 'Rato alado', category: 'Ferais', threat: 3, imageUrl: null, responsibleName: 'Descobridor' }] }));
   for (const category of model.categories) assert.ok(html.includes(category));
-  assert.match(html, /Rato alado/); assert.match(html, /3 de 5 estrelas/);
+  assert.match(html, /Rato alado/); assert.match(html, /3 de 8 estrelas/);
+  assert.match(html, /value="8"/);
   assert.equal((html.match(/<select/g) || []).length, 2);
+});
+
+test('damage categories are validated and gray is saved as null', () => {
+  for (const damage of ['', 'magic', 'physical', 'hybrid']) {
+    const data = form({ ability_name: 'Mordida', ability_description: '', ability_damage_type: damage });
+    assert.equal(model.parseCreature(data).abilities[0].damage_type, damage || null);
+  }
+  assert.equal(model.parseCreature(form({ ability_name: 'Voo', ability_description: '' })).abilities[0].damage_type, null);
+  for (const damage of ['red', 'invalid', 'null']) assert.equal(model.parseCreature(form({ ability_name: 'Voo', ability_description: '', ability_damage_type: damage })), null);
+  const mismatch = form({ ability_name: 'Voo', ability_description: '', ability_damage_type: '' });
+  mismatch.append('ability_damage_type', 'magic');
+  assert.equal(model.parseCreature(mismatch), null);
+});
+
+test('level eight and ability colors reach the save payload', async () => {
+  const h = harness();
+  const data = form({ id: creatureId, threat: '8', ability_name: 'Mordida', ability_description: 'Dano físico', ability_damage_type: 'physical' });
+  await assert.rejects(h.actions.saveCreature({ error: '' }, data), /REDIRECT:/);
+  assert.equal(h.writes[0].threat, 8);
+  assert.equal(h.writes[0].abilities[0].damage_type, 'physical');
+});
+
+test('manual renders eight difficulty levels and all four damage meanings', () => {
+  const dependencies = { react: React, 'react/jsx-runtime': jsx, './bestiario.module.css': { default: {} }, './model': model };
+  const dot = compile('../app/bestiario/DamageDot.tsx', dependencies);
+  const stars = compile('../app/bestiario/ThreatStars.tsx', dependencies);
+  const manual = compile('../app/bestiario/BestiaryManual.tsx', { ...dependencies, './DamageDot': dot, './ThreatStars': stars });
+  const html = renderToStaticMarkup(React.createElement(manual.default));
+  assert.match(html, /<dialog/);
+  for (const level of model.threatLevels) assert.ok(html.includes(`${level} de 8 estrelas`));
+  for (const option of model.damageOptions) assert.ok(html.includes(option.label));
+  assert.match(html, /Chefes para um grupo de Divisão 1/);
+  const legacy = renderToStaticMarkup(React.createElement(dot.default));
+  assert.match(legacy, /Sem classificação/);
 });

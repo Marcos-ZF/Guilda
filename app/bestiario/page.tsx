@@ -3,6 +3,7 @@ import Header from "../Header";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import CreatureDirectory from "./CreatureDirectory";
+import BestiaryManual from "./BestiaryManual";
 import { type Creature, type EmployeeOption } from "./model";
 import layout from "../internal.module.css";
 import styles from "./bestiario.module.css";
@@ -24,7 +25,7 @@ export default async function BestiaryPage({ searchParams }: { searchParams: Pro
   return <div className={layout.page}><Header /><main>
     <section className={layout.hero}><p className={layout.eyebrow}>ARQUIVO DE CAMPO / ACESSO INTERNO</p><h1>Bestiário</h1><p>Criaturas encontradas pela companhia, suas habilidades e estratégias de combate.</p></section>
     <section className={layout.content}>
-      <div className={styles.toolbar}><h2>Arquivo de criaturas</h2><Link className={styles.button} href="/bestiario/novo">Nova criatura</Link></div>
+      <div className={styles.toolbar}><h2>Arquivo de criaturas</h2><div className={styles.toolbarActions}><BestiaryManual /><Link className={styles.button} href="/bestiario/novo">Nova criatura</Link></div></div>
       <p className={styles.notice}>Funcionários podem cadastrar e editar os próprios registros. A administração gerencia todo o arquivo.</p>
       {params.excluido && <p className={styles.notice}>Criatura excluída.</p>}
       {params.erro && <p role="alert" className={styles.error}>Não foi possível excluir o registro.</p>}

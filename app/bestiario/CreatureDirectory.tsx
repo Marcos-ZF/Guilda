@@ -2,7 +2,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { categories, filterCreatures, type Creature } from "./model";
+import { categories, threatLevels, filterCreatures, type Creature } from "./model";
 import ThreatStars from "./ThreatStars";
 import styles from "./bestiario.module.css";
 export type CreatureCard = Pick<Creature, "id" | "name" | "category" | "threat"> & { imageUrl: string | null; responsibleName: string | null };
@@ -16,7 +16,7 @@ export default function CreatureDirectory({ creatures }: { creatures: CreatureCa
     <div className={styles.filters}>
       <label>Pesquisar criatura<input type="search" placeholder="Digite um nome…" value={search} onChange={event => setSearch(event.target.value)} /></label>
       <label>Categoria<select value={category} onChange={event => setCategory(event.target.value)}><option value="">Todas as categorias</option>{categories.map(item => <option key={item}>{item}</option>)}</select></label>
-      <label>Nível de ameaça<select value={threat} onChange={event => setThreat(event.target.value)}><option value="">Todos os níveis</option>{[1,2,3,4,5].map(level => <option key={level} value={level}>{level} {level === 1 ? "estrela" : "estrelas"}</option>)}</select></label>
+      <label>Nível de ameaça<select value={threat} onChange={event => setThreat(event.target.value)}><option value="">Todos os níveis</option>{threatLevels.map(level => <option key={level} value={level}>{level} {level === 1 ? "estrela" : "estrelas"}</option>)}</select></label>
       {(search || category || threat) && <button type="button" onClick={() => { setSearch(""); setCategory(""); setThreat(""); }}>Limpar filtros</button>}
     </div>
     <p className={styles.resultCount} aria-live="polite">{visible.length} {visible.length === 1 ? "criatura encontrada" : "criaturas encontradas"}</p>
