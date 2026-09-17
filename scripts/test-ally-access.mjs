@@ -27,6 +27,7 @@ function compile(file, overrides = {}, role = 'aliado') {
   vm.runInNewContext(code, { exports, File, crypto, process: { env: { NEXT_PUBLIC_SUPABASE_URL: 'https://example.invalid', NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'test' } }, require(name) {
     if (name in dependencies) return dependencies[name];
     if (name.endsWith('.css')) return { default: {} };
+    if (name.endsWith('/InformationOrigin')) return compile('app/bestiario/InformationOrigin.tsx');
     if (/Header$|Modal$|ConfirmSubmitButton$|LiveNameSearch$|CreatureDirectory$|BestiaryManual$|ThreatStars$|DamageDot$|CreatureForm$|TreasuryLedger$|ImageCropInput$/.test(name)) return { default: () => null };
     if (name.endsWith('/model') || name === './model' || name === '../model') return compile('app/bestiario/model.ts');
     if (name.endsWith('/actions') || name === './actions') return {};

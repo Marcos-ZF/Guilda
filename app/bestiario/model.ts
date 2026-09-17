@@ -12,7 +12,7 @@ export const damageOptions = [
 export type Ability = { name: string; description: string; damage_type?: DamageType | null };
 export type Creature = {
   id: string; name: string; category: Category; threat: number; image_path: string;
-  description: string; abilities: Ability[]; strategies: string;
+  description: string; abilities: Ability[]; strategies: string; information_origin: string;
   discoverer_employee_id: string | null; created_by: string; created_at: string;
 };
 export type EmployeeOption = { id: string; code: string; name: string };
@@ -32,17 +32,18 @@ export function parseCreature(form: FormData) {
   const text = (key: string) => String(form.get(key) ?? "").trim();
   const name = text("name"), category = text("category"), threat = Number(text("threat"));
   const description = text("description"), strategies = text("strategies");
+  const information_origin = text("information_origin");
   const discoverer = text("discoverer_employee_id");
   const names = form.getAll("ability_name"), descriptions = form.getAll("ability_description");
   const damages = form.getAll("ability_damage_type");
   if (name.length < 2 || name.length > 120 || !categories.includes(category as Category)
     || !Number.isInteger(threat) || threat < 1 || threat > 8 || description.length > 10000
-    || strategies.length > 10000 || (discoverer && !uuidPattern.test(discoverer))
+    || strategies.length > 10000 || information_origin.length > 5000 || (discoverer && !uuidPattern.test(discoverer))
     || names.length > 20 || names.length !== descriptions.length
     || (damages.length !== 0 && damages.length !== names.length)
     || damages.some(value => value !== "" && !damageTypes.includes(String(value) as DamageType))) return null;
   const abilities = names.map((value, index) => ({ name: String(value).trim(), description: String(descriptions[index]).trim(), damage_type: (damages[index] || null) as DamageType | null }))
     .filter(ability => ability.name || ability.description);
   if (abilities.some(ability => !ability.name || ability.name.length > 100 || ability.description.length > 2000)) return null;
-  return { name, category: category as Category, threat, description, strategies, abilities, discoverer_employee_id: discoverer || null };
+  return { name, category: category as Category, threat, description, strategies, information_origin, abilities, discoverer_employee_id: discoverer || null };
 }

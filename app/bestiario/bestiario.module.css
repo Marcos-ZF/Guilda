@@ -14,7 +14,8 @@
 .cardMain{gap:14px;margin:16px 0 20px}
 .cardMain h3{font-size:clamp(22px,2vw,28px)}
 .stars{letter-spacing:1px}
-.facts dd .threatCount{font-family:var(--font-body);font-size:16px;line-height:1.4;font-variant-numeric:lining-nums tabular-nums;white-space:nowrap}
+.informationOrigin{max-height:128px;min-height:64px;overflow-y:auto;overflow-x:hidden;padding-right:10px;font-family:var(--font-body);font-size:17px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;scrollbar-width:thin;scrollbar-color:var(--red) var(--paper-2)}
+.informationOrigin:focus-visible{outline:2px solid var(--red);outline-offset:4px}
 .form label,.filters label{align-content:start}
 .form>label:not(.wide){grid-template-rows:40px 46px auto}
 .form>label:not(.wide)>input,.form>label:not(.wide)>select{height:46px}

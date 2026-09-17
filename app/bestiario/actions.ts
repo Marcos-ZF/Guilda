@@ -20,7 +20,7 @@ export async function saveCreature(_state: SaveState, form: FormData): Promise<S
     oldPath = data.image_path;
   }
   const input = parseCreature(form);
-  if (!input) return { error: "Confira nome, categoria, ameaça e habilidades. Cada habilidade precisa de um nome." };
+  if (!input) return { error: "Confira os campos e seus limites. A origem aceita até 5.000 caracteres e cada habilidade precisa de um nome." };
   if (input.discoverer_employee_id) {
     const { data, error } = await supabase.from("employees").select("id").eq("id", input.discoverer_employee_id).maybeSingle();
     if (error || !data) return { error: "O responsável selecionado não foi encontrado." };

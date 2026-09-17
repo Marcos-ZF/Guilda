@@ -23,6 +23,36 @@ const model = compile('../app/bestiario/model.ts');
 const ownId = '10000000-0000-4000-8000-000000000001';
 const otherId = '20000000-0000-4000-8000-000000000002';
 const creatureId = '30000000-0000-4000-8000-000000000003';
+
+test('information origin is optional, trimmed, and limited to 5000 characters', () => {
+  assert.equal(model.parseCreature(form()).information_origin, '');
+  assert.equal(model.parseCreature(form({ information_origin: '  Relato\nExpedição  ' })).information_origin, 'Relato\nExpedição');
+  assert.ok(model.parseCreature(form({ information_origin: 'x'.repeat(5000) })));
+  assert.equal(model.parseCreature(form({ information_origin: 'x'.repeat(5001) })), null);
+});
+test('information origin reaches create and update payloads and can be cleared', async () => {
+  for (const existing of [false,true]) {
+    const h = harness();
+    const data = form({ ...(existing ? {id:creatureId} : {}), information_origin:'Relato de campo' });
+    if (!existing) data.set('image', new File(['test'],'photo.png',{type:'image/png'}));
+    await assert.rejects(h.actions.saveCreature({error:''},data), /REDIRECT:/);
+    assert.equal(h.writes[0].information_origin, 'Relato de campo');
+  }
+  const h = harness();
+  await assert.rejects(h.actions.saveCreature({error:''},form({id:creatureId,information_origin:''})), /REDIRECT:/);
+  assert.equal(h.writes[0].information_origin, '');
+});
+test('origin escapes markup, keeps line breaks, and has an accessible scroll region', () => {
+  const Origin = compile('../app/bestiario/InformationOrigin.tsx', { 'react/jsx-runtime':jsx, './bestiario.module.css':{default:{}} }).default;
+  const html = renderToStaticMarkup(React.createElement(Origin,{text:'<script>alert(1)</script>\nRelato'}));
+  assert.ok(html.includes('&lt;script&gt;'));
+  assert.ok(html.includes('\nRelato'));
+  assert.match(html,/role="region"/); assert.match(html,/tabindex="0"/);
+  assert.match(renderToStaticMarkup(React.createElement(Origin)),/Não informada/);
+  const detail = readFileSync(new URL('../app/bestiario/[id]/page.tsx',import.meta.url),'utf8');
+  assert.ok(!detail.includes('threatCount'));
+  assert.ok(detail.includes('<ThreatStars level={creature.threat} />'));
+});
 function form(extra = {}) {
   const data = new FormData();
   Object.entries({ name: 'Rato alado', category: 'Ferais', threat: '2', ...extra }).forEach(([key,value]) => data.set(key, value));

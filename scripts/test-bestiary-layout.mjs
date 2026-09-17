@@ -24,9 +24,11 @@ deps['./DamageDot'] = compile('../app/bestiario/DamageDot.tsx', deps);
 const Form = compile('../app/bestiario/CreatureForm.tsx', { ...deps, './actions': { saveCreature() {} }, '@/app/components/ImageCropInput': { default: () => null } }).default;
 const Directory = compile('../app/bestiario/CreatureDirectory.tsx', deps).default;
 const Manual = compile('../app/bestiario/BestiaryManual.tsx', deps).default;
+const Origin = compile('../app/bestiario/InformationOrigin.tsx', deps).default;
 const creature = { id: 'fixture', name: 'Criatura de teste', category: 'Sapiens', threat: 8, abilities: [{ name: 'Habilidade mágica', description: 'Descrição', damage_type: 'magic' }], description: '', strategies: '' };
 const css = readFileSync(new URL('../app/globals.css', import.meta.url), 'utf8') + readFileSync(new URL('../app/bestiario/bestiario.module.css', import.meta.url), 'utf8');
 const markup = renderToStaticMarkup(React.createElement(React.Fragment, null,
+  React.createElement('dl', {className:'facts',style:{maxWidth:'400px',marginBottom:'30px'}},React.createElement(Origin,{text:('Origem da informação: expedição em campo.\n').repeat(100)})),
   React.createElement(Form, { creature, employees: [{ id: 'test', code: 'T1', name: 'Nome de exemplo' }] }),
   React.createElement(Manual),
   React.createElement(Directory, { creatures: [1,2,3].map(id => ({ ...creature, id: String(id), imageUrl: null, responsibleName: 'Responsável' })) })));
@@ -47,6 +49,12 @@ try {
     assert.equal(values.overflow, false, `overflow at ${width}`);
     if (width > 760) assert.equal(values.aligned, true, `aligned controls at ${width}`);
     assert.ok(values.remove < values.add);
+    const origin = await page.locator('.informationOrigin').evaluate(element => {
+      element.scrollTop = 100;
+      return { height:element.getBoundingClientRect().height, scrolls:element.scrollHeight>element.clientHeight && element.scrollTop>0, font:getComputedStyle(element).fontSize, fits:element.scrollWidth<=element.clientWidth+1 };
+    });
+    assert.ok(origin.height<=128 && origin.scrolls && origin.fits);
+    assert.equal(origin.font,'17px');
     await page.evaluate(() => document.querySelector('dialog').showModal());
     assert.equal(await page.locator('dialog').isVisible(), true);
     const guide = await page.evaluate(() => {
