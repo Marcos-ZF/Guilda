@@ -28,7 +28,7 @@ const Origin = compile('../app/bestiario/InformationOrigin.tsx', deps).default;
 const creature = { id: 'fixture', name: 'Criatura de teste', category: 'Sapiens', threat: 8, abilities: [{ name: 'Habilidade mágica', description: 'Descrição', damage_type: 'magic' }], description: '', strategies: '' };
 const css = readFileSync(new URL('../app/globals.css', import.meta.url), 'utf8') + readFileSync(new URL('../app/bestiario/bestiario.module.css', import.meta.url), 'utf8');
 const markup = renderToStaticMarkup(React.createElement(React.Fragment, null,
-  React.createElement('dl', {className:'facts',style:{maxWidth:'400px',marginBottom:'30px'}},React.createElement(Origin,{text:('Origem da informação: expedição em campo.\n').repeat(100)})),
+  React.createElement('dl', {className:'facts',style:{maxWidth:'400px',marginBottom:'30px'}},React.createElement('div',null,React.createElement('dt',null,'Responsável'),React.createElement('dd',{className:'responsibleText'},'Não informado')),React.createElement(Origin,{text:('Origem da informação: expedição em campo.\n').repeat(100)})),
   React.createElement(Form, { creature, employees: [{ id: 'test', code: 'T1', name: 'Nome de exemplo' }] }),
   React.createElement(Manual),
   React.createElement(Directory, { creatures: [1,2,3].map(id => ({ ...creature, id: String(id), imageUrl: null, responsibleName: 'Responsável' })) })));
@@ -55,6 +55,7 @@ try {
     });
     assert.ok(origin.height<=128 && origin.scrolls && origin.fits);
     assert.equal(origin.font,'17px');
+    assert.equal(await page.locator('.responsibleText').evaluate(element=>getComputedStyle(element).fontSize),'17px');
     await page.evaluate(() => document.querySelector('dialog').showModal());
     assert.equal(await page.locator('dialog').isVisible(), true);
     const guide = await page.evaluate(() => {

@@ -29,7 +29,7 @@ export default async function Home() {
     const supabase = await createClient();
     const [{ data: metricData }, { data: timelineData, error: timelineError }] = await Promise.all([
       supabase.rpc("home_metrics"),
-      supabase.from("timeline_entries").select("id,entry_type,entry_date,title,description,involved:timeline_entry_employees(employee:employees(id,code,name))").order("entry_date", { ascending: false }).order("created_at", { ascending: false }).limit(40).returns<TimelineEntry[]>(),
+      supabase.from("timeline_entries").select("id,entry_type,entry_date,title,description,involved:timeline_entry_employees(employee:employees(id,code,name))").or("source_type.is.null,source_type.neq.report").order("entry_date", { ascending: false }).order("created_at", { ascending: false }).limit(40).returns<TimelineEntry[]>(),
     ]);
     if (metricData && typeof metricData === "object") metrics = metricData as HomeMetrics;
     timelineUnavailable = Boolean(timelineError);

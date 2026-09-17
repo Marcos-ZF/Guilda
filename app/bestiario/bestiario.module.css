@@ -16,6 +16,7 @@
 .stars{letter-spacing:1px}
 .informationOrigin{max-height:128px;min-height:64px;overflow-y:auto;overflow-x:hidden;padding-right:10px;font-family:var(--font-body);font-size:17px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;scrollbar-width:thin;scrollbar-color:var(--red) var(--paper-2)}
 .informationOrigin:focus-visible{outline:2px solid var(--red);outline-offset:4px}
+.facts dd.responsibleText{font-family:var(--font-body);font-size:17px;line-height:1.7;overflow-wrap:anywhere}
 .form label,.filters label{align-content:start}
 .form>label:not(.wide){grid-template-rows:40px 46px auto}
 .form>label:not(.wide)>input,.form>label:not(.wide)>select{height:46px}
