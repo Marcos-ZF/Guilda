@@ -163,7 +163,7 @@ test('directory renders all categories, cards, two filters and accessible stars'
   });
   const html = renderToStaticMarkup(React.createElement(directory.default, { creatures: [{ id: creatureId, name: 'Rato alado', category: 'Ferais', subcategory: 'Corrompido', threat: 3, imageUrl: null, responsibleName: 'Descobridor' }] }));
   for (const category of model.categories) assert.ok(html.includes(category));
-  assert.match(html, /Rato alado/); assert.match(html, /Corrompido · Ferais/); assert.match(html, /3 de 8 estrelas/);
+  assert.match(html, /Rato alado/); assert.match(html, /Ferais · Corrompido/); assert.match(html, /3 de 8 estrelas/);
   assert.match(html, /value="8"/);
   assert.equal((html.match(/<select/g) || []).length, 2);
 });

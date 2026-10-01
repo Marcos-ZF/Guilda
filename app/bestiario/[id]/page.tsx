@@ -25,7 +25,7 @@ export default async function CreaturePage({ params, searchParams }: { params: P
     creature.discoverer_employee_id ? supabase.from("employees").select("name,code").eq("id", creature.discoverer_employee_id).maybeSingle() : Promise.resolve({ data: null }),
   ]);
   return <><Header /><main className={styles.detail}>
-    <p className={styles.kicker}>Bestiário / {creature.subcategory ? `${creature.subcategory} · ` : ""}{creature.category}</p><h1>{creature.name}</h1>
+    <p className={styles.kicker}>Bestiário / {creature.category}{creature.subcategory ? ` · ${creature.subcategory}` : ""}</p><h1>{creature.name}</h1>
     {query.salvo && <p className={styles.notice}>Registro salvo com sucesso.</p>}
     <div className={styles.detailOverview}>
       {image?.signedUrl ? <img className={styles.detailImage} src={image.signedUrl} alt={creature.name} width={800} height={600} /> : <div className={styles.imagePlaceholder}>Foto indisponível</div>}
