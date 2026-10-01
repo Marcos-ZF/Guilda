@@ -51,5 +51,6 @@
 .manual .unlit{color:#a39d96}
 .damageLegend li{display:flex;align-items:baseline;gap:12px;margin:14px 0}
 @media(min-width:761px) and (max-width:1050px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.filters{grid-template-columns:2fr 1fr 1fr 1fr}
 @media(max-width:760px){.filters,.cards,.detailOverview,.form{grid-template-columns:minmax(0,1fr)}.toolbar{align-items:stretch;flex-direction:column}.detail{width:calc(100% - 36px);padding-top:120px}.card{padding:22px}.form{padding:20px}.detailOverview{gap:24px}.cardFoot{flex-wrap:wrap}.stars{font-size:20px;letter-spacing:1px}.form>label:not(.wide){grid-template-rows:auto 46px auto}.manualPanel{padding:20px}.manual header h2{font-size:27px}}
 @media(max-width:380px){.cardMain{grid-template-columns:1fr}.cardTop{align-items:flex-start;flex-direction:column}.category>h2{flex-wrap:wrap;gap:8px}}

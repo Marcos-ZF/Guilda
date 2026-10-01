@@ -166,8 +166,9 @@ test('directory renders all categories, cards, two filters and accessible stars'
   for (const category of model.categories) assert.ok(html.includes(category));
   assert.match(html, /Rato alado/); assert.match(html, /Ferais · Corrompido/); assert.match(html, /3 de 8 estrelas/);
   assert.match(html, /value="8"/);
-  assert.equal((html.match(/<select/g) || []).length, 2);
-  assert.match(html, /Sub-Categoria: Corrompido/);
+  assert.equal((html.match(/<select/g) || []).length, 3);
+  assert.match(html, /Todas as subcategorias/);
+  assert.match(html, />Corrompido</);
 });
 
 test('damage categories are validated and gray is saved as null', () => {

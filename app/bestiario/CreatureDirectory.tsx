@@ -10,16 +10,16 @@ export type CreatureCard = Pick<Creature, "id" | "name" | "category" | "threat" 
 export default function CreatureDirectory({ creatures }: { creatures: CreatureCard[] }) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
+  const [subcategory, setSubcategory] = useState("");
   const [threat, setThreat] = useState("");
-  const selectedSubcategory = category.startsWith("subcategory:") ? category.slice("subcategory:".length) : "";
-  const selectedCategory = selectedSubcategory ? "" : category;
-  const visible = useMemo(() => filterCreatures(creatures, search, selectedCategory, threat, selectedSubcategory), [creatures, search, selectedCategory, threat, selectedSubcategory]);
+  const visible = useMemo(() => filterCreatures(creatures, search, category, threat, subcategory), [creatures, search, category, threat, subcategory]);
   return <>
     <div className={styles.filters}>
       <label>Pesquisar criatura<input type="search" placeholder="Digite um nome…" value={search} onChange={event => setSearch(event.target.value)} /></label>
-      <label>Categoria<select value={category} onChange={event => setCategory(event.target.value)}><option value="">Todas as categorias</option>{categories.map(item => <option key={item}>{item}</option>)}{subcategories.map(item => <option key={`subcategory-${item}`} value={`subcategory:${item}`}>Sub-Categoria: {item}</option>)}</select></label>
+      <label>Categoria<select value={category} onChange={event => setCategory(event.target.value)}><option value="">Todas as categorias</option>{categories.map(item => <option key={item}>{item}</option>)}</select></label>
+      <label>Sub-Categoria<select value={subcategory} onChange={event => setSubcategory(event.target.value)}><option value="">Todas as subcategorias</option>{subcategories.map(item => <option key={item}>{item}</option>)}</select></label>
       <label>Nível de ameaça<select value={threat} onChange={event => setThreat(event.target.value)}><option value="">Todos os níveis</option>{threatLevels.map(level => <option key={level} value={level}>{level} {level === 1 ? "estrela" : "estrelas"}</option>)}</select></label>
-      {(search || category || threat) && <button type="button" onClick={() => { setSearch(""); setCategory(""); setThreat(""); }}>Limpar filtros</button>}
+      {(search || category || subcategory || threat) && <button type="button" onClick={() => { setSearch(""); setCategory(""); setSubcategory(""); setThreat(""); }}>Limpar filtros</button>}
     </div>
     <p className={styles.resultCount} aria-live="polite">{visible.length} {visible.length === 1 ? "criatura encontrada" : "criaturas encontradas"}</p>
     {categories.filter(item => !category || item === category).map(item => {
