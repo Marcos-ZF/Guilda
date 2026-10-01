@@ -15,7 +15,7 @@ const categoryDescriptions: Record<Category, string> = {
 };
 
 const subcategoryDescriptions: Record<Subcategory, string> = {
-  Corrompido: "Criaturas alteradas ou contaminadas por forças sombrias, maldições ou influências que distorcem sua natureza original.",
+  Corrompido: "Criaturas alteradas por maldições, anomalias energéticas ou exposição prolongada a forças profanas. Deformações visíveis que refletem a natureza da corrupção, habilidades antinatural e instabilidade energética constante",
 };
 
 const difficulty = [
