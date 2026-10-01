@@ -2,7 +2,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { categories, threatLevels, filterCreatures, type Creature } from "./model";
+import { categories, subcategories, threatLevels, filterCreatures, type Creature } from "./model";
 import ThreatStars from "./ThreatStars";
 import styles from "./bestiario.module.css";
 export type CreatureCard = Pick<Creature, "id" | "name" | "category" | "threat" | "subcategory"> & { imageUrl: string | null; responsibleName: string | null };
@@ -11,11 +11,13 @@ export default function CreatureDirectory({ creatures }: { creatures: CreatureCa
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [threat, setThreat] = useState("");
-  const visible = useMemo(() => filterCreatures(creatures, search, category, threat), [creatures, search, category, threat]);
+  const selectedSubcategory = category.startsWith("subcategory:") ? category.slice("subcategory:".length) : "";
+  const selectedCategory = selectedSubcategory ? "" : category;
+  const visible = useMemo(() => filterCreatures(creatures, search, selectedCategory, threat, selectedSubcategory), [creatures, search, selectedCategory, threat, selectedSubcategory]);
   return <>
     <div className={styles.filters}>
       <label>Pesquisar criatura<input type="search" placeholder="Digite um nome…" value={search} onChange={event => setSearch(event.target.value)} /></label>
-      <label>Categoria<select value={category} onChange={event => setCategory(event.target.value)}><option value="">Todas as categorias</option>{categories.map(item => <option key={item}>{item}</option>)}</select></label>
+      <label>Categoria<select value={category} onChange={event => setCategory(event.target.value)}><option value="">Todas as categorias</option>{categories.map(item => <option key={item}>{item}</option>)}{subcategories.map(item => <option key={`subcategory-${item}`} value={`subcategory:${item}`}>Sub-Categoria: {item}</option>)}</select></label>
       <label>Nível de ameaça<select value={threat} onChange={event => setThreat(event.target.value)}><option value="">Todos os níveis</option>{threatLevels.map(level => <option key={level} value={level}>{level} {level === 1 ? "estrela" : "estrelas"}</option>)}</select></label>
       {(search || category || threat) && <button type="button" onClick={() => { setSearch(""); setCategory(""); setThreat(""); }}>Limpar filtros</button>}
     </div>

@@ -40,10 +40,12 @@ try {
     await page.setContent(`<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style></head><body><main style="max-width:1240px;margin:20px auto;padding:16px">${markup}</main></body></html>`);
     const values = await page.evaluate(() => {
       const threat = document.querySelector('[name=threat]').getBoundingClientRect();
+      const subcategory = document.querySelector('[name=subcategory]').getBoundingClientRect();
       const responsible = document.querySelector('[name=discoverer_employee_id]').getBoundingClientRect();
+      const origin = document.querySelector('[name=information_origin]').getBoundingClientRect();
       const cards = [...document.querySelectorAll('.card')].map(item => item.getBoundingClientRect());
       const controls = [...document.querySelectorAll('input,select,textarea,.card,.stars,.damagePicker')].filter(item => !item.closest('dialog')).map(item => item.getBoundingClientRect());
-      return { aligned: Math.abs(threat.y - responsible.y) < 1 && threat.height === responsible.height, columns: cards.filter(item => item.y === cards[0].y).length, overflow: controls.some(item => item.right > innerWidth + 1 || item.left < -1), remove: document.querySelector('.removeAbility').getBoundingClientRect().height, add: [...document.querySelectorAll('button')].find(item => item.textContent.includes('Adicionar habilidade')).getBoundingClientRect().height };
+      return { aligned: Math.abs(threat.y - subcategory.y) < 1 && threat.height === subcategory.height && responsible.bottom <= origin.top, columns: cards.filter(item => item.y === cards[0].y).length, overflow: controls.some(item => item.right > innerWidth + 1 || item.left < -1), remove: document.querySelector('.removeAbility').getBoundingClientRect().height, add: [...document.querySelectorAll('button')].find(item => item.textContent.includes('Adicionar habilidade')).getBoundingClientRect().height };
     });
     assert.equal(values.columns, columns, `columns at ${width}`);
     assert.equal(values.overflow, false, `overflow at ${width}`);
@@ -64,7 +66,7 @@ try {
       const description = document.querySelector('.categoryGuide p');
       return { count: document.querySelectorAll('.categoryGuide li').length, titleSize: parseFloat(getComputedStyle(title).fontSize), descriptionSize: parseFloat(getComputedStyle(description).fontSize), overflow: dialog.scrollWidth > dialog.clientWidth + 1 };
     });
-    assert.equal(guide.count, 6);
+    assert.equal(guide.count, 7);
     assert.ok(guide.titleSize > guide.descriptionSize);
     assert.equal(guide.overflow, false, `manual overflow at ${width}`);
     if (process.env.MANUAL_SCREENSHOT && [1440,390].includes(width)) await page.screenshot({ path: `${process.env.MANUAL_SCREENSHOT}-${width}.png` });

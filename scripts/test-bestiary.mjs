@@ -83,10 +83,11 @@ test('abilities stay separate and empty optional fields are accepted', () => {
   assert.equal(model.parseCreature(data), null);
 });
 test('search ignores accents; category and threat filters combine independently', () => {
-  const rows = [{ name: 'Árvore Sombria', category: 'Vegetais', threat: 4 }, { name: 'Rato', category: 'Ferais', threat: 1 }];
+  const rows = [{ name: 'Árvore Sombria', category: 'Vegetais', subcategory: 'Corrompido', threat: 4 }, { name: 'Rato', category: 'Ferais', subcategory: null, threat: 1 }];
   assert.equal(model.filterCreatures(rows, 'arvore', '', '').length, 1);
   assert.equal(model.filterCreatures(rows, '', 'Ferais', '1').length, 1);
   assert.equal(model.filterCreatures(rows, 'rato', 'Ferais', '4').length, 0);
+  assert.equal(model.filterCreatures(rows, '', '', '', 'Corrompido').length, 1);
 });
 
 function harness(role = 'funcionario', author = ownId, failure = false) {
@@ -166,6 +167,7 @@ test('directory renders all categories, cards, two filters and accessible stars'
   assert.match(html, /Rato alado/); assert.match(html, /Ferais · Corrompido/); assert.match(html, /3 de 8 estrelas/);
   assert.match(html, /value="8"/);
   assert.equal((html.match(/<select/g) || []).length, 2);
+  assert.match(html, /Sub-Categoria: Corrompido/);
 });
 
 test('damage categories are validated and gray is saved as null', () => {

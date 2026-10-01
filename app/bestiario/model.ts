@@ -25,10 +25,11 @@ export function canEditCreature(profile: { id: string; role: string }, creature:
 export function normalizeSearch(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR");
 }
-export function filterCreatures<T extends { name: string; category: string; threat: number }>(items: T[], search: string, category: string, threat: string) {
+export function filterCreatures<T extends { name: string; category: string; threat: number; subcategory?: string | null }>(items: T[], search: string, category: string, threat: string, subcategory = "") {
   const query = normalizeSearch(search.trim());
   return items.filter(item => normalizeSearch(item.name).includes(query)
-    && (!category || item.category === category) && (!threat || item.threat === Number(threat)));
+    && (!category || item.category === category) && (!threat || item.threat === Number(threat))
+    && (!subcategory || item.subcategory === subcategory));
 }
 export function parseCreature(form: FormData) {
   const text = (key: string) => String(form.get(key) ?? "").trim();
