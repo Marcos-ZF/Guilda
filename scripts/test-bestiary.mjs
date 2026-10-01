@@ -30,6 +30,11 @@ test('information origin is optional, trimmed, and limited to 5000 characters', 
   assert.ok(model.parseCreature(form({ information_origin: 'x'.repeat(5000) })));
   assert.equal(model.parseCreature(form({ information_origin: 'x'.repeat(5001) })), null);
 });
+test('subcategory only accepts the Corrompido option and reaches the payload', () => {
+  assert.equal(model.parseCreature(form()).subcategory, null);
+  assert.equal(model.parseCreature(form({ subcategory: 'Corrompido' })).subcategory, 'Corrompido');
+  assert.equal(model.parseCreature(form({ subcategory: 'Outra' })), null);
+});
 test('information origin reaches create and update payloads and can be cleared', async () => {
   for (const existing of [false,true]) {
     const h = harness();
@@ -156,9 +161,9 @@ test('directory renders all categories, cards, two filters and accessible stars'
   const directory = compile('../app/bestiario/CreatureDirectory.tsx', { ...dependencies,
     './ThreatStars': stars, 'next/link': { default: ({ children, ...props }) => React.createElement('a', props, children) },
   });
-  const html = renderToStaticMarkup(React.createElement(directory.default, { creatures: [{ id: creatureId, name: 'Rato alado', category: 'Ferais', threat: 3, imageUrl: null, responsibleName: 'Descobridor' }] }));
+  const html = renderToStaticMarkup(React.createElement(directory.default, { creatures: [{ id: creatureId, name: 'Rato alado', category: 'Ferais', subcategory: 'Corrompido', threat: 3, imageUrl: null, responsibleName: 'Descobridor' }] }));
   for (const category of model.categories) assert.ok(html.includes(category));
-  assert.match(html, /Rato alado/); assert.match(html, /3 de 8 estrelas/);
+  assert.match(html, /Rato alado/); assert.match(html, /Corrompido · Ferais/); assert.match(html, /3 de 8 estrelas/);
   assert.match(html, /value="8"/);
   assert.equal((html.match(/<select/g) || []).length, 2);
 });

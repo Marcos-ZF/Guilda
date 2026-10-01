@@ -25,11 +25,11 @@ export default async function CreaturePage({ params, searchParams }: { params: P
     creature.discoverer_employee_id ? supabase.from("employees").select("name,code").eq("id", creature.discoverer_employee_id).maybeSingle() : Promise.resolve({ data: null }),
   ]);
   return <><Header /><main className={styles.detail}>
-    <p className={styles.kicker}>Bestiário / {creature.category}</p><h1>{creature.name}</h1>
+    <p className={styles.kicker}>Bestiário / {creature.subcategory ? `${creature.subcategory} · ` : ""}{creature.category}</p><h1>{creature.name}</h1>
     {query.salvo && <p className={styles.notice}>Registro salvo com sucesso.</p>}
     <div className={styles.detailOverview}>
       {image?.signedUrl ? <img className={styles.detailImage} src={image.signedUrl} alt={creature.name} width={800} height={600} /> : <div className={styles.imagePlaceholder}>Foto indisponível</div>}
-      <dl className={styles.facts}><div><dt>Categoria</dt><dd>{creature.category}</dd></div><div><dt>Nível de ameaça</dt><dd><ThreatStars level={creature.threat} /></dd></div><div><dt>Responsável pela descoberta e informações</dt><dd className={styles.responsibleText}>{responsible ? <Link href={`/funcionarios/${responsible.code}`}>{responsible.name}</Link> : "Não informado"}</dd></div><InformationOrigin text={creature.information_origin} /></dl>
+      <dl className={styles.facts}><div><dt>Categoria</dt><dd>{creature.category}</dd></div><div><dt>Nível de ameaça</dt><dd><ThreatStars level={creature.threat} /></dd></div><div><dt>Responsável pela descoberta e informações</dt><dd className={styles.responsibleText}>{responsible ? <Link href={`/funcionarios/${responsible.code}`}>{responsible.name}</Link> : "Não informado"}</dd></div><InformationOrigin text={creature.information_origin} /><div><dt>Sub-Categoria</dt><dd>{creature.subcategory || "Nenhuma"}</dd></div></dl>
     </div>
     <section className={styles.textSection}><h2>Descrição</h2><p>{creature.description || "Nenhuma descrição registrada."}</p></section>
     <section className={styles.textSection}><h2>Habilidades</h2>{creature.abilities.length ? <ul className={styles.abilities}>{creature.abilities.map((ability, index) => <li key={index}><h3 className={styles.abilityTitle}><DamageDot type={ability.damage_type} />{ability.name}</h3>{ability.description && <p>{ability.description}</p>}</li>)}</ul> : <p>Nenhuma habilidade registrada.</p>}</section>

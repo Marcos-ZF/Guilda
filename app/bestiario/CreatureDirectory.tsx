@@ -5,7 +5,7 @@ import Link from "next/link";
 import { categories, threatLevels, filterCreatures, type Creature } from "./model";
 import ThreatStars from "./ThreatStars";
 import styles from "./bestiario.module.css";
-export type CreatureCard = Pick<Creature, "id" | "name" | "category" | "threat"> & { imageUrl: string | null; responsibleName: string | null };
+export type CreatureCard = Pick<Creature, "id" | "name" | "category" | "threat" | "subcategory"> & { imageUrl: string | null; responsibleName: string | null };
 
 export default function CreatureDirectory({ creatures }: { creatures: CreatureCard[] }) {
   const [search, setSearch] = useState("");
@@ -25,7 +25,7 @@ export default function CreatureDirectory({ creatures }: { creatures: CreatureCa
       return <section className={styles.category} key={item} aria-label={item}>
         <h2>{item}<small>{rows.length} registros</small></h2>
         {rows.length ? <div className={styles.cards}>{rows.map(creature => <Link className={styles.card} href={`/bestiario/${creature.id}`} key={creature.id}>
-          <div className={styles.cardTop}><span>{creature.category}</span><ThreatStars level={creature.threat} /></div>
+          <div className={styles.cardTop}><span>{creature.subcategory ? `${creature.subcategory} · ` : ""}{creature.category}</span><ThreatStars level={creature.threat} /></div>
           <div className={styles.cardMain}><h3>{creature.name}</h3>{creature.imageUrl ? <img src={creature.imageUrl} alt={creature.name} width={240} height={180} loading="lazy" /> : <div className={styles.imagePlaceholder}>Foto indisponível</div>}</div>
           <div className={styles.cardFoot}><span>{creature.responsibleName || "Responsável não informado"}</span><span>Abrir registro →</span></div>
         </Link>)}</div> : <p className={styles.empty}>{search || threat ? "Nenhuma criatura corresponde aos filtros nesta categoria." : "Nenhuma criatura cadastrada nesta categoria."}</p>}

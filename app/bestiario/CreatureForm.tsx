@@ -3,7 +3,7 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import ImageCropInput from "@/app/components/ImageCropInput";
 import { saveCreature } from "./actions";
-import { categories, threatLevels, damageOptions, type DamageType, type Creature, type EmployeeOption } from "./model";
+import { categories, subcategories, threatLevels, damageOptions, type DamageType, type Creature, type EmployeeOption } from "./model";
 import DamageDot from "./DamageDot";
 import ThreatStars from "./ThreatStars";
 import styles from "./bestiario.module.css";
@@ -11,7 +11,7 @@ import styles from "./bestiario.module.css";
 export default function CreatureForm({ creature, employees }: { creature?: Creature; employees: EmployeeOption[] }) {
   const [state, action, pending] = useActionState(saveCreature, { error: "" });
   const [threat, setThreat] = useState(creature?.threat ?? 1);
-  const [fields, setFields] = useState({ name: creature?.name ?? "", category: creature?.category ?? categories[0] as string, discoverer_employee_id: creature?.discoverer_employee_id ?? "", description: creature?.description ?? "", strategies: creature?.strategies ?? "", information_origin: creature?.information_origin ?? "" });
+  const [fields, setFields] = useState({ name: creature?.name ?? "", category: creature?.category ?? categories[0] as string, subcategory: creature?.subcategory ?? "", discoverer_employee_id: creature?.discoverer_employee_id ?? "", description: creature?.description ?? "", strategies: creature?.strategies ?? "", information_origin: creature?.information_origin ?? "" });
   const changeField = (key: keyof typeof fields, value: string) => setFields(current => ({ ...current, [key]: value }));
   const [abilities, setAbilities] = useState(() => (creature?.abilities ?? []).map((ability, index) => ({ ...ability, key: String(index) })));
   return <form action={action} className={styles.form}>
@@ -20,8 +20,9 @@ export default function CreatureForm({ creature, employees }: { creature?: Creat
     <label>Categoria<select name="category" value={fields.category} onChange={event => changeField("category", event.target.value)}>{categories.map(category => <option key={category}>{category}</option>)}</select></label>
     <label>Nível de ameaça<select name="threat" value={threat} onChange={event => setThreat(Number(event.target.value))}>{threatLevels.map(level => <option value={level} key={level}>{level} {level === 1 ? "estrela" : "estrelas"}</option>)}</select><ThreatStars level={threat} /></label>
     <label>Responsável pela descoberta e informações (opcional)<select name="discoverer_employee_id" value={fields.discoverer_employee_id} onChange={event => changeField("discoverer_employee_id", event.target.value)}><option value="">Não informado</option>{employees.map(employee => <option key={employee.id} value={employee.id}>{employee.name} · {employee.code}</option>)}</select></label>
-    <div className={styles.wide}><ImageCropInput name="image" label={creature ? "Trocar foto (opcional)" : "Foto da criatura"} aspect={4/3} fit="contain" /><p className={styles.hint}>{creature ? "Sem uma nova imagem, a foto atual será mantida." : "Escolha a imagem e confirme o enquadramento em Aplicar."}</p></div>
     <label className={styles.wide}>Origem da Informação (opcional)<textarea name="information_origin" value={fields.information_origin} onChange={event => changeField("information_origin", event.target.value)} maxLength={5000} placeholder="Ex.: observação em campo, relato de uma expedição ou documento consultado." /></label>
+    <div className={styles.wide}><ImageCropInput name="image" label={creature ? "Trocar foto (opcional)" : "Foto da criatura"} aspect={4/3} fit="contain" /><p className={styles.hint}>{creature ? "Sem uma nova imagem, a foto atual será mantida." : "Escolha a imagem e confirme o enquadramento em Aplicar."}</p></div>
+    <label className={styles.wide}>Sub-Categoria<select name="subcategory" value={fields.subcategory} onChange={event => changeField("subcategory", event.target.value)}><option value="">Nenhuma</option>{subcategories.map(subcategory => <option key={subcategory} value={subcategory}>{subcategory}</option>)}</select></label>
     <label className={styles.wide}>Descrição (opcional)<textarea name="description" value={fields.description} onChange={event => changeField("description", event.target.value)} maxLength={10000} /></label>
     <fieldset className={styles.wide}><legend>Habilidades</legend>
       {abilities.map((ability, index) => <div className={styles.abilityEditor} key={ability.key}>

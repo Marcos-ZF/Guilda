@@ -8,14 +8,14 @@ import { type Creature, type EmployeeOption } from "./model";
 import layout from "../internal.module.css";
 import styles from "./bestiario.module.css";
 export const dynamic = "force-dynamic";
-type Row = Pick<Creature, "id" | "name" | "category" | "threat" | "image_path" | "discoverer_employee_id">;
+type Row = Pick<Creature, "id" | "name" | "category" | "threat" | "subcategory" | "image_path" | "discoverer_employee_id">;
 
 export default async function BestiaryPage({ searchParams }: { searchParams: Promise<{ excluido?: string; erro?: string }> }) {
   const profile = await requireRole(["aliado", "funcionario", "admin"]);
   const params = await searchParams;
   const supabase = await createClient();
   const [{ data, error }, { data: employees, error: employeeError }] = await Promise.all([
-    supabase.from("bestiary_creatures").select("id,name,category,threat,image_path,discoverer_employee_id").order("name").returns<Row[]>(),
+    supabase.from("bestiary_creatures").select("id,name,category,threat,subcategory,image_path,discoverer_employee_id").order("name").returns<Row[]>(),
     supabase.from("employees").select("id,code,name").returns<EmployeeOption[]>(),
   ]);
   const rows = data ?? [];
@@ -29,7 +29,7 @@ export default async function BestiaryPage({ searchParams }: { searchParams: Pro
       <p className={styles.notice}>{profile.role === "aliado" ? "Acesso de aliado: consulta do Bestiário, sem permissão para alterações." : "Funcionários podem cadastrar e editar os próprios registros. A administração gerencia todo o arquivo."}</p>
       {params.excluido && <p className={styles.notice}>Criatura excluída.</p>}
       {params.erro && <p role="alert" className={styles.error}>Não foi possível excluir o registro.</p>}
-      {error || employeeError ? <p role="alert" className={styles.error}>Não foi possível carregar o Bestiário. Se esta é a primeira publicação, execute o SQL do Bestiário no Supabase.</p> : <CreatureDirectory creatures={rows.map(item => ({ id: item.id, name: item.name, category: item.category, threat: item.threat, imageUrl: imageUrls.get(item.image_path) || null, responsibleName: names.get(item.discoverer_employee_id ?? "") || null }))} />}
+      {error || employeeError ? <p role="alert" className={styles.error}>Não foi possível carregar o Bestiário. Se esta é a primeira publicação, execute o SQL do Bestiário no Supabase.</p> : <CreatureDirectory creatures={rows.map(item => ({ id: item.id, name: item.name, category: item.category, threat: item.threat, subcategory: item.subcategory, imageUrl: imageUrls.get(item.image_path) || null, responsibleName: names.get(item.discoverer_employee_id ?? "") || null }))} />}
       <Link className={layout.back} href="/">← Voltar para a Home</Link>
     </section>
   </main></div>;
